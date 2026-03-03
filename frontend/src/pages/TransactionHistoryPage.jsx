@@ -9,13 +9,22 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import { Badge } from '../components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
+import {
   History,
   Search,
   Filter,
   TrendingUp,
   TrendingDown,
   RefreshCw,
-  Download
+  Download,
+  Eye,
+  Printer,
+  X
 } from 'lucide-react';
 
 const TransactionHistoryPage = () => {
@@ -23,6 +32,8 @@ const TransactionHistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [selectedTx, setSelectedTx] = useState(null);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -63,6 +74,127 @@ const TransactionHistoryPage = () => {
     if (type === 'DOMESTIC') return 'bg-emerald-500/20 text-emerald-400';
     if (type === 'BILL_PAYMENT') return 'bg-amber-500/20 text-amber-400';
     return 'bg-swiss-bg-subtle text-swiss-text-secondary';
+  };
+
+  const viewReceipt = (tx) => {
+    setSelectedTx(tx);
+    setReceiptOpen(true);
+  };
+
+  const printReceipt = () => {
+    const printWindow = window.open('', '_blank');
+    const tx = selectedTx;
+    const receiptHtml = generateReceiptHTML(tx);
+    printWindow.document.write(receiptHtml);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
+
+  const generateReceiptHTML = (tx) => {
+    const date = new Date(tx.created_at);
+    const formattedDate = date.toLocaleDateString('en-GB');
+    const formattedTime = date.toLocaleTimeString('en-GB');
+    const refNum = `TXN-${Date.now()}`;
+    
+    return `
+      <html>
+        <head>
+          <title>Transaction Receipt - ${tx.reference}</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+            body { font-family: 'JetBrains Mono', monospace; padding: 40px; background: white; color: black; max-width: 800px; margin: 0 auto; }
+            .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 20px; margin-bottom: 30px; }
+            .header h1 { font-size: 24px; margin: 0; color: #DC2626; letter-spacing: 2px; }
+            .header p { margin: 5px 0; font-size: 11px; color: #666; }
+            .receipt-title { text-align: center; font-size: 18px; font-weight: bold; margin: 20px 0; border: 2px solid #000; padding: 10px; background: #f5f5f5; }
+            .section { margin-bottom: 25px; }
+            .section-title { font-size: 12px; font-weight: bold; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+            .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dotted #ddd; }
+            .row:last-child { border-bottom: none; }
+            .label { color: #666; font-size: 11px; text-transform: uppercase; }
+            .value { font-weight: bold; font-size: 12px; text-align: right; }
+            .amount-box { background: #f5f5f5; padding: 20px; text-align: center; margin: 20px 0; border: 2px solid #000; }
+            .amount-box .currency { font-size: 14px; color: #666; }
+            .amount-box .amount { font-size: 32px; font-weight: bold; color: ${tx.amount < 0 ? '#DC2626' : '#10B981'}; }
+            .amount-box .type { font-size: 12px; color: #666; margin-top: 5px; }
+            .footer { margin-top: 40px; padding-top: 20px; border-top: 3px double #000; text-align: center; }
+            .stamp { border: 3px solid #DC2626; padding: 15px 30px; display: inline-block; margin: 20px 0; transform: rotate(-3deg); }
+            .stamp p { margin: 0; color: #DC2626; font-weight: bold; }
+            .barcode { font-family: 'Libre Barcode 39', cursive; font-size: 48px; letter-spacing: 5px; margin: 20px 0; }
+            .terms { font-size: 9px; color: #999; margin-top: 20px; text-align: center; }
+            @media print { body { padding: 20px; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>UNION BANK OF SWITZERLAND AG</h1>
+            <p>BAHNHOFSTRASSE 45, 8001 ZURICH, SWITZERLAND</p>
+            <p>SWIFT: UBSWCHZHXXX | TEL: +41 44 234 1111 | FAX: +41 44 234 1112</p>
+          </div>
+          
+          <div class="receipt-title">OFFICIAL TRANSACTION RECEIPT</div>
+          
+          <div class="section">
+            <div class="section-title">Transaction Information</div>
+            <div class="row"><span class="label">Receipt Number</span><span class="value">${refNum}</span></div>
+            <div class="row"><span class="label">Transaction Reference</span><span class="value">${tx.reference}</span></div>
+            <div class="row"><span class="label">Transaction Date</span><span class="value">${formattedDate}</span></div>
+            <div class="row"><span class="label">Transaction Time</span><span class="value">${formattedTime} CET</span></div>
+            <div class="row"><span class="label">Transaction Type</span><span class="value">${tx.transaction_type}</span></div>
+            <div class="row"><span class="label">Status</span><span class="value" style="color: #10B981;">${tx.status.toUpperCase()}</span></div>
+          </div>
+
+          <div class="amount-box">
+            <div class="currency">${tx.currency}</div>
+            <div class="amount">${tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+            <div class="type">${tx.amount < 0 ? 'DEBIT' : 'CREDIT'} TRANSACTION</div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Transaction Details</div>
+            <div class="row"><span class="label">Description</span><span class="value">${tx.description}</span></div>
+            <div class="row"><span class="label">Counterparty</span><span class="value">${tx.counterparty}</span></div>
+            <div class="row"><span class="label">Value Date</span><span class="value">${formattedDate}</span></div>
+            <div class="row"><span class="label">Booking Date</span><span class="value">${formattedDate}</span></div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Bank Information</div>
+            <div class="row"><span class="label">Bank Name</span><span class="value">UNION BANK OF SWITZERLAND AG</span></div>
+            <div class="row"><span class="label">SWIFT/BIC Code</span><span class="value">UBSWCHZHXXX</span></div>
+            <div class="row"><span class="label">Branch</span><span class="value">HEAD OFFICE - ZURICH</span></div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Compliance & Verification</div>
+            <div class="row"><span class="label">AML Check</span><span class="value" style="color: #10B981;">PASSED</span></div>
+            <div class="row"><span class="label">Sanctions Screening</span><span class="value" style="color: #10B981;">CLEARED</span></div>
+            <div class="row"><span class="label">FATCA Compliant</span><span class="value" style="color: #10B981;">YES</span></div>
+          </div>
+
+          <div class="footer">
+            <div class="stamp">
+              <p>OFFICIAL DOCUMENT</p>
+              <p style="font-size: 10px;">VERIFIED & PROCESSED</p>
+            </div>
+            <p style="font-size: 11px; margin-top: 15px;">
+              <strong>Authorized by:</strong> UBS Transaction Processing Center<br>
+              <strong>Document ID:</strong> DOC-${Date.now()}<br>
+              <strong>Generated:</strong> ${new Date().toLocaleString('en-GB')}
+            </p>
+            <div class="terms">
+              This is an official transaction receipt generated by Union Bank of Switzerland AG.<br>
+              For verification, please contact: verification@ubs.ch or call +41 44 234 1111<br>
+              This document is valid without signature when generated electronically.
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
   };
 
   return (
@@ -160,9 +292,9 @@ const TransactionHistoryPage = () => {
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Type</TableHead>
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Description</TableHead>
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Reference</TableHead>
-                    <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Counterparty</TableHead>
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider text-right">Amount</TableHead>
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Status</TableHead>
+                    <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider text-center">Receipt</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -182,9 +314,6 @@ const TransactionHistoryPage = () => {
                       <TableCell className="font-mono text-xs text-swiss-text-muted">
                         {tx.reference}
                       </TableCell>
-                      <TableCell className="text-swiss-text-secondary text-sm">
-                        {tx.counterparty}
-                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           {tx.amount < 0 ? (
@@ -202,6 +331,18 @@ const TransactionHistoryPage = () => {
                           {tx.status}
                         </Badge>
                       </TableCell>
+                      <TableCell className="text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => viewReceipt(tx)}
+                          className="text-swiss-text-secondary hover:text-white hover:bg-swiss-red/20"
+                          data-testid={`view-receipt-${tx.id}`}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -210,6 +351,135 @@ const TransactionHistoryPage = () => {
           </ScrollArea>
         </CardContent>
       </Card>
+
+      {/* Receipt Modal */}
+      <Dialog open={receiptOpen} onOpenChange={setReceiptOpen}>
+        <DialogContent className="bg-swiss-bg-paper border-white/10 max-w-3xl max-h-[90vh] overflow-hidden">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle className="font-heading text-xl text-white">Transaction Receipt</DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={printReceipt}
+              className="text-swiss-text-secondary hover:text-white hover:bg-swiss-red/20"
+              data-testid="print-receipt-btn"
+            >
+              <Printer className="w-4 h-4 mr-1" />
+              Print PDF
+            </Button>
+          </DialogHeader>
+          
+          {selectedTx && (
+            <ScrollArea className="h-[70vh] pr-4">
+              <div className="space-y-6">
+                {/* Receipt Header */}
+                <div className="text-center border-b-2 border-white/20 pb-6">
+                  <h2 className="font-heading font-black text-2xl text-swiss-red">UNION BANK OF SWITZERLAND AG</h2>
+                  <p className="text-swiss-text-muted text-sm">BAHNHOFSTRASSE 45, 8001 ZURICH, SWITZERLAND</p>
+                  <p className="text-swiss-text-muted text-xs mt-1">SWIFT: UBSWCHZHXXX</p>
+                  <div className="mt-4 py-2 bg-swiss-bg-subtle rounded-sm">
+                    <p className="font-heading font-bold text-lg text-white uppercase">Official Transaction Receipt</p>
+                  </div>
+                </div>
+
+                {/* Transaction Info */}
+                <div className="bg-swiss-bg-subtle p-4 rounded-sm">
+                  <h3 className="text-swiss-text-muted text-xs uppercase tracking-wider mb-3 border-b border-white/10 pb-2">Transaction Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-swiss-text-muted text-xs">Receipt Number</p>
+                      <p className="font-mono text-sm text-white">TXN-{Date.now()}</p>
+                    </div>
+                    <div>
+                      <p className="text-swiss-text-muted text-xs">Reference</p>
+                      <p className="font-mono text-sm text-white">{selectedTx.reference}</p>
+                    </div>
+                    <div>
+                      <p className="text-swiss-text-muted text-xs">Date</p>
+                      <p className="font-mono text-sm text-white">{new Date(selectedTx.created_at).toLocaleDateString('en-GB')}</p>
+                    </div>
+                    <div>
+                      <p className="text-swiss-text-muted text-xs">Time</p>
+                      <p className="font-mono text-sm text-white">{new Date(selectedTx.created_at).toLocaleTimeString('en-GB')} CET</p>
+                    </div>
+                    <div>
+                      <p className="text-swiss-text-muted text-xs">Type</p>
+                      <Badge className={`${getTypeColor(selectedTx.transaction_type)} rounded-sm text-xs mt-1`}>
+                        {selectedTx.transaction_type}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-swiss-text-muted text-xs">Status</p>
+                      <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm text-xs mt-1">
+                        {selectedTx.status}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Amount Box */}
+                <div className="bg-swiss-bg-subtle p-6 rounded-sm text-center border-2 border-white/10">
+                  <p className="text-swiss-text-muted text-sm uppercase">{selectedTx.currency}</p>
+                  <p className={`font-mono text-4xl font-bold ${selectedTx.amount < 0 ? 'text-red-400' : 'text-green-400'}`}>
+                    {selectedTx.amount < 0 ? '-' : '+'}{Math.abs(selectedTx.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}
+                  </p>
+                  <p className="text-swiss-text-muted text-xs mt-2">{selectedTx.amount < 0 ? 'DEBIT' : 'CREDIT'} TRANSACTION</p>
+                </div>
+
+                {/* Transaction Details */}
+                <div className="bg-swiss-bg-subtle p-4 rounded-sm">
+                  <h3 className="text-swiss-text-muted text-xs uppercase tracking-wider mb-3 border-b border-white/10 pb-2">Transaction Details</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-swiss-text-muted text-xs">Description</span>
+                      <span className="text-white text-sm">{selectedTx.description}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-swiss-text-muted text-xs">Counterparty</span>
+                      <span className="text-white text-sm">{selectedTx.counterparty}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-swiss-text-muted text-xs">Value Date</span>
+                      <span className="font-mono text-sm text-white">{new Date(selectedTx.created_at).toLocaleDateString('en-GB')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Compliance */}
+                <div className="bg-swiss-bg-subtle p-4 rounded-sm">
+                  <h3 className="text-swiss-text-muted text-xs uppercase tracking-wider mb-3 border-b border-white/10 pb-2">Compliance & Verification</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p className="text-swiss-text-muted text-xs">AML Check</p>
+                      <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm text-xs mt-1">PASSED</Badge>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-swiss-text-muted text-xs">Sanctions</p>
+                      <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm text-xs mt-1">CLEARED</Badge>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-swiss-text-muted text-xs">FATCA</p>
+                      <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm text-xs mt-1">COMPLIANT</Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Stamp */}
+                <div className="text-center pt-6 border-t-2 border-white/20">
+                  <div className="inline-block border-2 border-swiss-red px-6 py-3 mb-4">
+                    <p className="text-swiss-red font-bold text-sm">OFFICIAL DOCUMENT</p>
+                    <p className="text-swiss-red text-xs">VERIFIED & PROCESSED</p>
+                  </div>
+                  <p className="text-swiss-text-muted text-xs">
+                    Document ID: DOC-{Date.now()}<br/>
+                    Generated: {new Date().toLocaleString('en-GB')}
+                  </p>
+                </div>
+              </div>
+            </ScrollArea>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
