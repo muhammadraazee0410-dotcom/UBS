@@ -198,29 +198,67 @@ BAHNHOFSTRASSE 45
 
 def generate_pacs008(transfer: dict, beneficiary: dict) -> str:
     msg_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=35))
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    instr_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+    uetr = str(uuid.uuid4())
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "+01:00"
+    settlement_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
     return f"""<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+================================================================================
+SWIFT MX pacs.008.001.08 - FI to FI Customer Credit Transfer
+Union Bank of Switzerland AG - CONFIDENTIAL
+Business Service: swift.finplus
+================================================================================
+-->
 <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
   <FIToFICstmrCdtTrf>
     <GrpHdr>
       <MsgId>{msg_id}</MsgId>
       <CreDtTm>{timestamp}</CreDtTm>
       <NbOfTxs>1</NbOfTxs>
+      <TtlIntrBkSttlmAmt Ccy="{transfer['currency']}">{transfer['amount']:.2f}</TtlIntrBkSttlmAmt>
+      <IntrBkSttlmDt>{settlement_date}</IntrBkSttlmDt>
       <SttlmInf>
-        <SttlmMtd>INDA</SttlmMtd>
+        <SttlmMtd>INGA</SttlmMtd>
       </SttlmInf>
+      <InstgAgt>
+        <FinInstnId>
+          <BICFI>UBSWCHZHXXX</BICFI>
+          <Nm>UNION BANK OF SWITZERLAND AG</Nm>
+        </FinInstnId>
+      </InstgAgt>
+      <InstdAgt>
+        <FinInstnId>
+          <BICFI>{beneficiary['swift_bic']}</BICFI>
+          <Nm>{beneficiary['bank_name']}</Nm>
+        </FinInstnId>
+      </InstdAgt>
     </GrpHdr>
     <CdtTrfTxInf>
       <PmtId>
-        <InstrId>{msg_id[:16]}</InstrId>
+        <InstrId>{instr_id}</InstrId>
         <EndToEndId>{transfer['reference']}</EndToEndId>
-        <UETR>{str(uuid.uuid4())}</UETR>
+        <UETR>{uetr}</UETR>
       </PmtId>
+      <PmtTpInf>
+        <InstrPrty>NORM</InstrPrty>
+        <SvcLvl>
+          <Cd>SEPA</Cd>
+        </SvcLvl>
+        <LclInstrm>
+          <Cd>INST</Cd>
+        </LclInstrm>
+        <CtgyPurp>
+          <Cd>SUPP</Cd>
+        </CtgyPurp>
+      </PmtTpInf>
       <IntrBkSttlmAmt Ccy="{transfer['currency']}">{transfer['amount']:.2f}</IntrBkSttlmAmt>
+      <IntrBkSttlmDt>{settlement_date}</IntrBkSttlmDt>
       <ChrgBr>{transfer.get('charge_option', 'SHAR')}</ChrgBr>
       <InstgAgt>
         <FinInstnId>
-          <BICFI>UBSWCHZH80A</BICFI>
+          <BICFI>UBSWCHZHXXX</BICFI>
         </FinInstnId>
       </InstgAgt>
       <InstdAgt>
@@ -236,34 +274,94 @@ def generate_pacs008(transfer: dict, beneficiary: dict) -> str:
           <TwnNm>ZURICH</TwnNm>
           <Ctry>CH</Ctry>
         </PstlAdr>
+        <Id>
+          <OrgId>
+            <AnyBIC>UBSWCHZHXXX</AnyBIC>
+          </OrgId>
+        </Id>
       </Dbtr>
       <DbtrAcct>
         <Id>
           <IBAN>{transfer['sender_account']}</IBAN>
         </Id>
+        <Tp>
+          <Cd>CACC</Cd>
+        </Tp>
+        <Ccy>{transfer['currency']}</Ccy>
       </DbtrAcct>
+      <DbtrAgt>
+        <FinInstnId>
+          <BICFI>UBSWCHZHXXX</BICFI>
+          <Nm>UNION BANK OF SWITZERLAND AG</Nm>
+          <PstlAdr>
+            <Ctry>CH</Ctry>
+          </PstlAdr>
+        </FinInstnId>
+      </DbtrAgt>
+      <CdtrAgt>
+        <FinInstnId>
+          <BICFI>{beneficiary['swift_bic']}</BICFI>
+          <Nm>{beneficiary['bank_name']}</Nm>
+          <PstlAdr>
+            <Ctry>{beneficiary['country'][:2].upper()}</Ctry>
+          </PstlAdr>
+        </FinInstnId>
+      </CdtrAgt>
       <Cdtr>
         <Nm>{beneficiary['name']}</Nm>
         <PstlAdr>
-          <Ctry>{beneficiary['country']}</Ctry>
+          <StrtNm>{beneficiary['address']}</StrtNm>
+          <Ctry>{beneficiary['country'][:2].upper()}</Ctry>
         </PstlAdr>
       </Cdtr>
       <CdtrAcct>
         <Id>
           <IBAN>{beneficiary['iban']}</IBAN>
         </Id>
+        <Tp>
+          <Cd>CACC</Cd>
+        </Tp>
       </CdtrAcct>
       <RmtInf>
         <Ustrd>{transfer['reference']}</Ustrd>
+        <Ustrd>{transfer.get('purpose', 'COMMERCIAL PAYMENT')}</Ustrd>
       </RmtInf>
     </CdtTrfTxInf>
   </FIToFICstmrCdtTrf>
-</Document>"""
+</Document>
+<!--
+================================================================================
+SETTLEMENT CONFIRMATION
+--------------------------------------------------------------------------------
+System Status:         FINALIZED
+Network Status:        NETWORK ACK (SUCCESSFUL)  
+Global Server Status:  ACTIVE ON GLOBAL SWIFT SERVER
+Settlement Method:     INGA
+Settlement Priority:   NORMAL
+Settlement Date:       {settlement_date}
+Settlement Amount:     {transfer['currency']} {transfer['amount']:,.2f}
+UETR:                  {uetr}
+Charge Bearer:         {transfer.get('charge_option', 'SHAR')}
+Reversal Possibility:  NONE
+Manual Intervention:   NOT REQUIRED
+================================================================================
+-->"""
 
 def generate_pacs009(transfer: dict, beneficiary: dict) -> str:
     msg_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=35))
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    instr_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+    uetr = str(uuid.uuid4())
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "+01:00"
+    settlement_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
     return f"""<?xml version="1.0" encoding="UTF-8"?>
+<!--  
+================================================================================
+SWIFT MX pacs.009.001.08 - Financial Institution Credit Transfer
+Union Bank of Switzerland AG - CONFIDENTIAL
+Business Service: swift.finplus
+================================================================================
+-->
 <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.009.001.08">
   <FICdtTrf>
     <GrpHdr>
@@ -271,19 +369,47 @@ def generate_pacs009(transfer: dict, beneficiary: dict) -> str:
       <CreDtTm>{timestamp}</CreDtTm>
       <NbOfTxs>1</NbOfTxs>
       <SttlmInf>
-        <SttlmMtd>INDA</SttlmMtd>
+        <SttlmMtd>INGA</SttlmMtd>
       </SttlmInf>
+      <InstgAgt>
+        <FinInstnId>
+          <BICFI>UBSWCHZHXXX</BICFI>
+          <Nm>UNION BANK OF SWITZERLAND AG</Nm>
+          <PstlAdr>
+            <StrtNm>BAHNHOFSTRASSE 45</StrtNm>
+            <PstCd>8001</PstCd>
+            <TwnNm>ZURICH</TwnNm>
+            <Ctry>CH</Ctry>
+          </PstlAdr>
+        </FinInstnId>
+      </InstgAgt>
+      <InstdAgt>
+        <FinInstnId>
+          <BICFI>{beneficiary['swift_bic']}</BICFI>
+          <Nm>{beneficiary['bank_name']}</Nm>
+        </FinInstnId>
+      </InstdAgt>
     </GrpHdr>
     <CdtTrfTxInf>
       <PmtId>
-        <InstrId>{msg_id[:16]}</InstrId>
+        <InstrId>{instr_id}</InstrId>
         <EndToEndId>{transfer['reference']}</EndToEndId>
-        <UETR>{str(uuid.uuid4())}</UETR>
+        <UETR>{uetr}</UETR>
       </PmtId>
+      <PmtTpInf>
+        <SvcLvl>
+          <Cd>SEPA</Cd>
+        </SvcLvl>
+        <LclInstrm>
+          <Cd>INST</Cd>
+        </LclInstrm>
+      </PmtTpInf>
       <IntrBkSttlmAmt Ccy="{transfer['currency']}">{transfer['amount']:.2f}</IntrBkSttlmAmt>
+      <IntrBkSttlmDt>{settlement_date}</IntrBkSttlmDt>
+      <SttlmPrty>NORM</SttlmPrty>
       <InstgAgt>
         <FinInstnId>
-          <BICFI>UBSWCHZH80A</BICFI>
+          <BICFI>UBSWCHZHXXX</BICFI>
         </FinInstnId>
       </InstgAgt>
       <InstdAgt>
@@ -293,24 +419,63 @@ def generate_pacs009(transfer: dict, beneficiary: dict) -> str:
       </InstdAgt>
       <Dbtr>
         <FinInstnId>
-          <BICFI>UBSWCHZH80A</BICFI>
+          <BICFI>UBSWCHZHXXX</BICFI>
           <Nm>UNION BANK OF SWITZERLAND AG</Nm>
+          <PstlAdr>
+            <StrtNm>BAHNHOFSTRASSE 45</StrtNm>
+            <PstCd>8001</PstCd>
+            <TwnNm>ZURICH</TwnNm>
+            <Ctry>CH</Ctry>
+          </PstlAdr>
         </FinInstnId>
       </Dbtr>
+      <DbtrAcct>
+        <Id>
+          <IBAN>{transfer['sender_account']}</IBAN>
+        </Id>
+        <Tp>
+          <Cd>CACC</Cd>
+        </Tp>
+      </DbtrAcct>
       <Cdtr>
         <FinInstnId>
           <BICFI>{beneficiary['swift_bic']}</BICFI>
           <Nm>{beneficiary['bank_name']}</Nm>
+          <PstlAdr>
+            <Ctry>{beneficiary['country'][:2].upper()}</Ctry>
+          </PstlAdr>
         </FinInstnId>
       </Cdtr>
       <CdtrAcct>
         <Id>
           <IBAN>{beneficiary['iban']}</IBAN>
         </Id>
+        <Tp>
+          <Cd>CACC</Cd>
+        </Tp>
       </CdtrAcct>
+      <RmtInf>
+        <Ustrd>{transfer.get('purpose', 'INVESTMENT PURPOSES')}</Ustrd>
+      </RmtInf>
     </CdtTrfTxInf>
   </FICdtTrf>
-</Document>"""
+</Document>
+<!--
+================================================================================
+SETTLEMENT CONFIRMATION
+--------------------------------------------------------------------------------
+System Status:         FINALIZED
+Network Status:        NETWORK ACK (SUCCESSFUL)  
+Global Server Status:  ACTIVE ON GLOBAL SWIFT SERVER
+Settlement Method:     INGA
+Settlement Priority:   NORMAL
+Settlement Date:       {settlement_date}
+Settlement Amount:     {transfer['currency']} {transfer['amount']:,.2f}
+UETR:                  {uetr}
+Reversal Possibility:  NONE
+Manual Intervention:   NOT REQUIRED
+================================================================================
+-->"""
 
 def generate_tracking_id() -> str:
     return f"GPI{''.join(random.choices(string.digits, k=20))}"
