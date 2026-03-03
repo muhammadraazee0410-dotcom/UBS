@@ -1,53 +1,68 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "./components/ui/sonner";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import InternationalTransferPage from "./pages/InternationalTransferPage";
+import DomesticTransferPage from "./pages/DomesticTransferPage";
+import BillPaymentPage from "./pages/BillPaymentPage";
+import TransactionHistoryPage from "./pages/TransactionHistoryPage";
+import PaymentTrackingPage from "./pages/PaymentTrackingPage";
+import BeneficiaryPage from "./pages/BeneficiaryPage";
+import ServerConsolePage from "./pages/ServerConsolePage";
+import DatabasePage from "./pages/DatabasePage";
+import Layout from "./components/Layout";
+import "./App.css";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-swiss-bg flex items-center justify-center">
+        <div className="text-white font-mono">Loading...</div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
 };
 
 function App() {
   return (
-    <div className="App">
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<DashboardPage />} />
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/international-transfer" element={<InternationalTransferPage />} />
+                    <Route path="/domestic-transfer" element={<DomesticTransferPage />} />
+                    <Route path="/bill-payment" element={<BillPaymentPage />} />
+                    <Route path="/transactions" element={<TransactionHistoryPage />} />
+                    <Route path="/tracking" element={<PaymentTrackingPage />} />
+                    <Route path="/beneficiaries" element={<BeneficiaryPage />} />
+                    <Route path="/console" element={<ServerConsolePage />} />
+                    <Route path="/database" element={<DatabasePage />} />
+                  </Routes>
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
+        <Toaster position="top-right" theme="dark" />
       </BrowserRouter>
-    </div>
+    </AuthProvider>
   );
 }
 
