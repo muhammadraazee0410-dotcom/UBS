@@ -175,26 +175,105 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
 
 def generate_mt103(transfer: dict, beneficiary: dict) -> str:
     ref = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-    timestamp = datetime.now(timezone.utc).strftime("%y%m%d%H%M")
-    return f""":20:{ref}
+    timestamp = datetime.now(timezone.utc)
+    value_date = timestamp.strftime("%y%m%d")
+    full_date = timestamp.strftime("%d/%m/%Y")
+    time_stamp = timestamp.strftime("%H:%M:%S")
+    officer_pin = ''.join(random.choices(string.digits, k=5))
+    
+    # Generate realistic SWIFT header blocks
+    sender_bic = "UBSWCHZHXXX"
+    session_num = ''.join(random.choices(string.digits, k=4))
+    sequence_num = ''.join(random.choices(string.digits, k=6))
+    
+    return f"""
+================================================================================
+                         UNION BANK OF SWITZERLAND AG
+                              SWIFT MESSAGE COPY
+                          MT103 SINGLE CUSTOMER CREDIT TRANSFER
+================================================================================
+DATE: {full_date}                                           TIME: {time_stamp} CET
+--------------------------------------------------------------------------------
+
+SWIFT OUTPUT FIN                                              COPY FOR RECORDS
+================================================================================
+
+{{1:F01{sender_bic}{session_num}{sequence_num}}}
+{{2:O103{value_date}1200{beneficiary['swift_bic']}N}}
+{{3:{{108:{ref}}}}}
+{{4:
+:20:{ref}
 :23B:CRED
-:32A:{timestamp}{transfer['currency']}{transfer['amount']:.2f}
-:33B:{transfer['currency']}{transfer['amount']:.2f}
+:32A:{value_date}{transfer['currency']}{transfer['amount']:,.2f}
+:33B:{transfer['currency']}{transfer['amount']:,.2f}
 :50K:/{transfer['sender_account']}
 UNION BANK OF SWITZERLAND AG
 BAHNHOFSTRASSE 45
-8001 ZURICH SWITZERLAND
-:52A:UBSWCHZH80A
-:53A:UBSWCHZH80A
+8001 ZURICH, SWITZERLAND
+:52A:{sender_bic}
+UNION BANK OF SWITZERLAND AG
+:53A:{sender_bic}
 :57A:{beneficiary['swift_bic']}
+{beneficiary['bank_name'].upper()}
 :59:/{beneficiary['account_number']}
-{beneficiary['name']}
-{beneficiary['address']}
-{beneficiary['country']}
+{beneficiary['name'].upper()}
+{beneficiary['address'].upper()}
+{beneficiary['country'].upper()}
 :70:{transfer['reference']}
+{transfer.get('purpose', 'COMMERCIAL PAYMENT')}
 :71A:{transfer.get('charge_option', 'SHA')}
-:72:/REC/UNION BANK OF SWITZERLAND
--"""
+:72:/REC/UNION BANK OF SWITZERLAND AG
+/ACC/INVESTMENT TRANSACTION
+-}}
+{{5:{{MAC:00000000}}{{CHK:123456789ABC}}}}
+
+================================================================================
+                        TARGET2 CLEARING ACKNOWLEDGMENT
+================================================================================
+ACKNOWLEDGED BY TARGET2 [TRABORERXXX] [ACK]
+SETTLEMENT STATUS: SETTLED
+SETTLEMENT DATE: {full_date}
+SETTLEMENT TIME: {time_stamp} CET
+================================================================================
+
+================================================================================
+                    OFFICIAL CUSTOMER STATEMENT MESSAGE
+================================================================================
+DATE        TYPE      REFERENCE              AMOUNT           CURRENCY
+--------------------------------------------------------------------------------
+{full_date}  DEBIT     {ref}    {transfer['amount']:>15,.2f}      {transfer['currency']}
+--------------------------------------------------------------------------------
+                                    TOTAL:   {transfer['amount']:>15,.2f}      {transfer['currency']}
+================================================================================
+
+================================================================================
+              OFFICIAL REPORTING DOCUMENT RS/FATCA/AML COMPLIANCE
+================================================================================
+COMPLIANCE STATUS: VERIFIED
+SCREENING RESULT: PASSED
+SANCTIONS CHECK: CLEARED
+AML VERIFICATION: APPROVED
+================================================================================
+
+================================================================================
+                              AUTHORIZED OFFICER
+================================================================================
+REFERENCE: {ref}
+AUTHORIZED BY: MR. JOHANNES WEBER
+OFFICER PIN: {officer_pin}
+DIGITAL SIGNATURE: VERIFIED
+================================================================================
+
+                              [OFFICIAL STAMP]
+                        UNION BANK OF SWITZERLAND AG
+                            TRANSACTION VERIFIED
+                              {full_date}
+
+================================================================================
+                          TRANSPARENCY COMPLIANT
+              This document is an official SWIFT copy for records
+================================================================================
+"""
 
 def generate_pacs008(transfer: dict, beneficiary: dict) -> str:
     msg_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=35))
