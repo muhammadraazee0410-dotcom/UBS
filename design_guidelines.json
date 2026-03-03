@@ -1,0 +1,198 @@
+{
+  "identity": {
+    "persona": "E1: The Anti-AI Designer - Swiss Banking Edition",
+    "core_principles": [
+      "Fusion over Imitation: Mix Swiss typographic precision with 'The Performance Pro' dashboard density.",
+      "Emotion First: Evoke 'Institutional Security' and 'Elite Precision'.",
+      "Content is King: Data is the hero. Use JetBrains Mono for all financials.",
+      "Negative Space: Use it to separate high-density data clusters."
+    ],
+    "anti_patterns": [
+      "No purple or teal for CTAs. Use Swiss Red or Stark White only.",
+      "No Center-Everything. Use asymmetric grids.",
+      "No Gradient Overload. Use matte surfaces + 1px glows."
+    ]
+  },
+  "theme": {
+    "mode": "dark",
+    "name": "Swiss Vault",
+    "description": "A high-contrast, security-focused dark theme inspired by Swiss modernist graphic design and Bloomberg terminals."
+  },
+  "colors": {
+    "palette": {
+      "background": {
+        "default": "#020617",
+        "paper": "#0F172A",
+        "subtle": "#1E293B"
+      },
+      "text": {
+        "primary": "#FFFFFF",
+        "secondary": "#94A3B8",
+        "muted": "#64748B"
+      },
+      "primary": {
+        "main": "#DC2626",
+        "hover": "#B91C1C",
+        "foreground": "#FFFFFF"
+      },
+      "border": {
+        "default": "rgba(255, 255, 255, 0.1)",
+        "active": "rgba(255, 255, 255, 0.2)",
+        "highlight": "#DC2626"
+      },
+      "status": {
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "info": "#3B82F6"
+      }
+    },
+    "gradients": {
+      "subtle_glow": "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)",
+      "swiss_flag": "linear-gradient(45deg, #DC2626 0%, #991B1B 100%)"
+    },
+    "shadows": {
+      "card": "0 1px 0 0 rgba(255,255,255,0.1)",
+      "float": "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "headings": {
+        "family": "Chivo, sans-serif",
+        "weights": ["300", "400", "900"],
+        "usage": "Page titles, Section headers, Hero text"
+      },
+      "body": {
+        "family": "IBM Plex Sans, sans-serif",
+        "weights": ["400", "500"],
+        "usage": "General content, navigation, labels"
+      },
+      "mono": {
+        "family": "JetBrains Mono, monospace",
+        "weights": ["400", "700"],
+        "usage": "Financial data, SWIFT codes, Terminal, Transaction IDs"
+      }
+    },
+    "rules": [
+      "Headings: Uppercase allowed for H1/H2 for 'Swiss Poster' feel.",
+      "Tracking: Tight (-0.02em) for headings, Wide (0.05em) for labels.",
+      "Leading: None (1) for headings, Relaxed (1.6) for body.",
+      "Hierarchy: Use size and weight contrast (Light vs Black) rather than color."
+    ]
+  },
+  "layout": {
+    "grid_system": {
+      "type": "Bento Grid Mode B (High Density)",
+      "columns": "grid-cols-1 md:grid-cols-4 lg:grid-cols-12",
+      "gap": "gap-4 md:gap-6",
+      "padding": "p-6 md:p-8"
+    },
+    "spacing": {
+      "container_padding": "p-6 lg:p-12",
+      "section_gap": "gap-8"
+    },
+    "structure": {
+      "dashboard": "Asymmetric Bento Grid. Hero Balance Card (col-span-8), Quick Actions (col-span-4), Recent Tx (col-span-6), Market Data (col-span-6).",
+      "forms": "Multi-step Wizard for SWIFT. Split screen: Form on Left, Preview/Guide on Right.",
+      "terminal": "Full width or Modal. Fixed height `h-[600px]`."
+    }
+  },
+  "components": {
+    "library": "shadcn/ui",
+    "customization_rules": [
+      "Border Radius: `rounded-none` or `rounded-sm` (max 4px). Sharp corners preferred for 'Bank' feel.",
+      "Inputs: `bg-slate-900 border-white/10 focus:border-red-600 focus:ring-red-600/20`.",
+      "Cards: `bg-slate-950 border border-white/10 shadow-none hover:border-white/20 transition-colors`.",
+      "Buttons: 'Swiss' style. Solid Primary (Red), Outline Secondary (White/10%). Uppercase text."
+    ],
+    "specific_components": {
+      "server_console": {
+        "style": "Retro-Futurism / Terminal",
+        "bg": "#000000",
+        "text": "#00FF00 (green-500) or #FFFFFF",
+        "font": "JetBrains Mono",
+        "features": ["Blinking cursor", "Command history", "Auto-scroll"]
+      },
+      "swift_form": {
+        "style": "Structured Technical Form",
+        "layout": "Accordion sections for Tags (:20, :50, :59)",
+        "validation": "Real-time regex checks for SWIFT formats",
+        "preview": "Live 'Message Preview' showing raw MT103/MX XML output"
+      },
+      "balance_display": {
+        "style": "Hero Typography",
+        "font": "JetBrains Mono",
+        "size": "text-4xl md:text-6xl",
+        "details": "Currency code in superscript or smaller weight"
+      }
+    }
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "background",
+        "url": "https://images.unsplash.com/photo-1618035212548-5ce1cd822564",
+        "description": "Swiss Alps Black & White - Login/Hero Background"
+      },
+      {
+        "category": "texture",
+        "url": "https://images.unsplash.com/photo-1762343264418-1467f9394f49",
+        "description": "Dark Geometric Texture - Sidebar/Card Background"
+      },
+      {
+        "category": "user_profile",
+        "url": "https://images.unsplash.com/photo-1758518727984-17b37f2f0562",
+        "description": "Bank Admin Profile"
+      }
+    ],
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 1.5px (Thin/Elegant)",
+      "usage": "Use consistent stroke width. No filled icons unless active state."
+    }
+  },
+  "motion": {
+    "type": "Micro-interactions",
+    "library": "framer-motion",
+    "settings": {
+      "page_transition": {
+        "initial": { "opacity": 0, "y": 10 },
+        "animate": { "opacity": 1, "y": 0 },
+        "exit": { "opacity": 0, "y": -10 },
+        "transition": { "duration": 0.3, "ease": "easeOut" }
+      },
+      "hover": {
+        "scale": 1.01,
+        "borderColor": "rgba(255,255,255,0.3)"
+      }
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure 4.5:1 for all text. Use lighter grey (#E2E8F0) for body text on dark bg.",
+    "focus_states": "Visible Red Ring offset-2",
+    "aria": "Required for all interactive elements, especially complex SWIFT forms."
+  },
+  "universal_guidelines": {
+    "donts": [
+      "DO NOT use gradients for text.",
+      "DO NOT use rounded-xl or rounded-2xl. Keep it sharp.",
+      "DO NOT center text in data tables.",
+      "DO NOT use 'Inter' font for headings."
+    ],
+    "dos": [
+      "DO use 'JetBrains Mono' for all numbers.",
+      "DO add `data-testid` to all interactives.",
+      "DO use 'sonner' for toast notifications."
+    ]
+  },
+  "instructions_to_main_agent": [
+    "1. Setup Fonts: Import Chivo, IBM Plex Sans, and JetBrains Mono from Google Fonts.",
+    "2. Configure Tailwind: Add colors and fonts to tailwind.config.js.",
+    "3. Build Layout: Create the SidebarLayout component with the texture background.",
+    "4. Develop Dashboard: Implement the Bento Grid with Balance Cards.",
+    "5. Implement SWIFT: Create the complex form with validation logic.",
+    "6. Build Terminal: Create the simulated Server Console.",
+    "7. Final Polish: Add framer-motion transitions."
+  ]
+}
