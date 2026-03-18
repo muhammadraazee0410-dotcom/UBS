@@ -236,8 +236,13 @@ const AccountProfilePage = () => {
                     <p className="text-[10px] text-swiss-text-muted uppercase tracking-widest mb-2">Passport Details</p>
                     <InfoRow icon={Hash} label="Passport N\u00b0" value={sig.passport_number} />
                     <InfoRow icon={Globe} label="Country of Issue" value={sig.country_of_issue} />
+                    {sig.date_of_birth && <InfoRow icon={CalendarDays} label="Date of Birth" value={sig.date_of_birth} />}
+                    {sig.sex && <InfoRow icon={User} label="Sex" value={sig.sex} />}
+                    {sig.height && <InfoRow icon={FileText} label="Height" value={sig.height} />}
+                    {sig.place_of_origin && <InfoRow icon={MapPin} label="Place of Origin" value={sig.place_of_origin} />}
                     <InfoRow icon={CalendarDays} label="Date of Issue" value={sig.date_of_issue} />
                     <InfoRow icon={CalendarDays} label="Date of Expiry" value={sig.date_of_expiry} />
+                    {sig.issuing_authority && <InfoRow icon={Shield} label="Authority" value={sig.issuing_authority} />}
                   </>
                 ) : (
                   <>
