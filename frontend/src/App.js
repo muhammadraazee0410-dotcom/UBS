@@ -12,6 +12,7 @@ import BeneficiaryPage from "./pages/BeneficiaryPage";
 import ServerConsolePage from "./pages/ServerConsolePage";
 import DatabasePage from "./pages/DatabasePage";
 import DocumentsPage from "./pages/DocumentsPage";
+import StatementPage from "./pages/StatementPage";
 import Layout from "./components/Layout";
 import "./App.css";
 
@@ -54,6 +55,7 @@ function App() {
                     <Route path="/tracking" element={<PaymentTrackingPage />} />
                     <Route path="/beneficiaries" element={<BeneficiaryPage />} />
                     <Route path="/documents" element={<DocumentsPage />} />
+                    <Route path="/statement" element={<StatementPage />} />
                     <Route path="/console" element={<ServerConsolePage />} />
                     <Route path="/database" element={<DatabasePage />} />
                   </Routes>

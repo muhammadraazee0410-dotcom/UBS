@@ -35,6 +35,7 @@ CREATE UNION BANK OF SWITZERLAND AG BANK ADMIN PORTAL WITH INCLUDES ALL BANKING 
 - [x] Transaction History with search/filter + View Receipt modal (MT103 Answer Back)
 - [x] Payment Tracking with SWIFT GPI timeline visualization
 - [x] Beneficiary Management (CRUD)
+- [x] **Account Statement Page** with running balance per currency, opening/closing balances linked to dashboard totals, Print PDF
 - [x] Documents Page with 8 document tabs + Print PDF
 - [x] Server Console with command interface
 - [x] Database Viewer with collection browser
@@ -42,7 +43,7 @@ CREATE UNION BANK OF SWITZERLAND AG BANK ADMIN PORTAL WITH INCLUDES ALL BANKING 
 ### Frontend Pages
 - LoginPage, DashboardPage, InternationalTransferPage, DomesticTransferPage
 - BillPaymentPage, TransactionHistoryPage, PaymentTrackingPage
-- BeneficiaryPage, DocumentsPage, ServerConsolePage, DatabasePage
+- BeneficiaryPage, StatementPage, DocumentsPage, ServerConsolePage, DatabasePage
 
 ### Key Files
 - `/app/backend/server.py` - All API logic

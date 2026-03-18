@@ -897,6 +897,81 @@ async def get_collection_data(collection: str, limit: int = 50, payload: dict = 
     docs = await db[collection].find({}, {"_id": 0}).to_list(limit)
     return docs
 
+# ================ ACCOUNT STATEMENT ================
+
+STATIC_BALANCES = {
+    "EUR": {"balance": 150000883990393.93, "account_number": "001-8839903939", "iban": "CH93 0027 3001 8839 9039 39"},
+    "USD": {"balance": 15235883900008.07, "account_number": "002-5883900008", "iban": "CH93 0027 3002 5883 9000 08"},
+    "CHF": {"balance": 790000038990.88, "account_number": "003-0000389908", "iban": "CH93 0027 3003 0000 3899 08"},
+}
+
+@api_router.get("/statements/{currency}")
+async def get_account_statement(currency: str, payload: dict = Depends(verify_token)):
+    currency = currency.upper()
+    if currency not in STATIC_BALANCES:
+        raise HTTPException(status_code=400, detail="Invalid currency. Use EUR, USD, or CHF")
+
+    acct = STATIC_BALANCES[currency]
+    closing_balance = acct["balance"]
+
+    # Get transactions for this currency, sorted oldest first
+    transactions = await db.transactions.find(
+        {"currency": currency}, {"_id": 0}
+    ).sort("created_at", 1).to_list(1000)
+
+    for tx in transactions:
+        if isinstance(tx.get("created_at"), str):
+            tx["created_at"] = datetime.fromisoformat(tx["created_at"])
+
+    # Calculate opening balance by reversing all movements
+    total_movement = sum(tx.get("amount", 0) for tx in transactions)
+    opening_balance = closing_balance - total_movement
+
+    # Build statement lines with running balance
+    running = opening_balance
+    statement_lines = []
+    for tx in transactions:
+        running += tx.get("amount", 0)
+        statement_lines.append({
+            "id": tx.get("id", ""),
+            "date": tx["created_at"].isoformat() if isinstance(tx["created_at"], datetime) else tx["created_at"],
+            "description": tx.get("description", ""),
+            "reference": tx.get("reference", ""),
+            "transaction_type": tx.get("transaction_type", ""),
+            "debit": abs(tx["amount"]) if tx["amount"] < 0 else 0,
+            "credit": tx["amount"] if tx["amount"] > 0 else 0,
+            "balance": round(running, 2),
+        })
+
+    return {
+        "currency": currency,
+        "account_number": acct["account_number"],
+        "iban": acct["iban"],
+        "statement_date": datetime.now(timezone.utc).isoformat(),
+        "period_start": transactions[0]["created_at"].isoformat() if transactions else datetime.now(timezone.utc).isoformat(),
+        "period_end": datetime.now(timezone.utc).isoformat(),
+        "opening_balance": round(opening_balance, 2),
+        "closing_balance": round(closing_balance, 2),
+        "total_debits": round(sum(abs(tx["amount"]) for tx in transactions if tx["amount"] < 0), 2),
+        "total_credits": round(sum(tx["amount"] for tx in transactions if tx["amount"] > 0), 2),
+        "transaction_count": len(transactions),
+        "lines": statement_lines,
+    }
+
+@api_router.get("/statements")
+async def get_all_statements_summary(payload: dict = Depends(verify_token)):
+    result = []
+    for cur, acct in STATIC_BALANCES.items():
+        tx_count = await db.transactions.count_documents({"currency": cur})
+        result.append({
+            "currency": cur,
+            "account_number": acct["account_number"],
+            "iban": acct["iban"],
+            "balance": acct["balance"],
+            "transaction_count": tx_count,
+        })
+    return result
+
 # ================ DASHBOARD STATS ================
 
 @api_router.get("/dashboard/stats")

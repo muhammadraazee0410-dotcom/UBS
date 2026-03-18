@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  FileText
+  FileText,
+  FileSpreadsheet
 } from 'lucide-react';
 
 const UBSLogo = ({ className }) => (
@@ -37,6 +38,7 @@ const navItems = [
   { path: '/transactions', label: 'Transaction History', icon: History },
   { path: '/tracking', label: 'Payment Tracking', icon: MapPin },
   { path: '/beneficiaries', label: 'Beneficiaries', icon: Users },
+  { path: '/statement', label: 'Statement', icon: FileSpreadsheet },
   { path: '/documents', label: 'Documents', icon: FileText },
   { path: '/console', label: 'Server Console', icon: Terminal },
   { path: '/database', label: 'Database', icon: Database },
