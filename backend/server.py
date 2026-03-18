@@ -897,6 +897,54 @@ async def get_collection_data(collection: str, limit: int = 50, payload: dict = 
     docs = await db[collection].find({}, {"_id": 0}).to_list(limit)
     return docs
 
+# ================ BANK LETTERS ================
+
+@api_router.get("/bank-letters")
+async def get_bank_letters(payload: dict = Depends(verify_token)):
+    now = datetime.now(timezone.utc)
+    ref_base = now.strftime("%Y%m%d")
+    officer_id = "JW-" + now.strftime("%y") + "-4821"
+
+    profile = {
+        "company_name": "BB BIOTECH AG",
+        "company_id": "CHE-102.169.627",
+        "address": "SCHWERTSTRASSE 6, 8200 SCHAFFHAUSEN, ZURICH, SWITZERLAND",
+        "authorized_person": "DR. ERICH HUNZIKER",
+        "authorized_title": "POA Holder/Authorised Signatory",
+        "passport": "X4765274",
+    }
+
+    balances_data = []
+    for cur, acct in STATIC_BALANCES.items():
+        balances_data.append({
+            "currency": cur,
+            "balance": acct["balance"],
+            "account_number": acct["account_number"],
+            "iban": acct["iban"],
+        })
+
+    return {
+        "date": now.isoformat(),
+        "profile": profile,
+        "balances": balances_data,
+        "officer": {
+            "name": "MR. JOHANNES WEBER",
+            "title": "Senior Vice President, Private Banking",
+            "department": "Institutional & Corporate Clients Division",
+            "direct_line": "+41 44 234 4821",
+            "email": "johannes.weber@ubs.com",
+            "officer_id": officer_id,
+        },
+        "references": {
+            "relationship_ref": f"UBS/RL/{ref_base}/001",
+            "confirmation_ref": f"UBS/BCL/{ref_base}/001",
+            "statement_ref": f"UBS/STM/{ref_base}/001",
+            "asset_ref": f"UBS/ACF/{ref_base}/001",
+        },
+        "account_opened": "15 January 2008",
+        "relationship_since": "2008",
+    }
+
 # ================ ACCOUNT PROFILE ================
 
 @api_router.get("/account-profile")

@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import AccountProfilePage from "./pages/AccountProfilePage";
+import BankLettersPage from "./pages/BankLettersPage";
 import InternationalTransferPage from "./pages/InternationalTransferPage";
 import DomesticTransferPage from "./pages/DomesticTransferPage";
 import BillPaymentPage from "./pages/BillPaymentPage";
@@ -50,6 +51,7 @@ function App() {
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/account-profile" element={<AccountProfilePage />} />
+                    <Route path="/bank-letters" element={<BankLettersPage />} />
                     <Route path="/international-transfer" element={<InternationalTransferPage />} />
                     <Route path="/domestic-transfer" element={<DomesticTransferPage />} />
                     <Route path="/bill-payment" element={<BillPaymentPage />} />
