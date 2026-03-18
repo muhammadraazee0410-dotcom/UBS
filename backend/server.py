@@ -909,8 +909,8 @@ async def get_bank_letters(payload: dict = Depends(verify_token)):
         "company_name": "BB BIOTECH AG",
         "company_id": "CHE-102.169.627",
         "address": "SCHWERTSTRASSE 6, 8200 SCHAFFHAUSEN, ZURICH, SWITZERLAND",
-        "authorized_person": "DR. ERICH HUNZIKER",
-        "authorized_title": "POA Holder/Authorised Signatory",
+        "authorized_person": "DR. ERICH HUNZIKER & MR. GABRIEL EGO",
+        "authorized_title": "POA Holders/Authorised Signatories",
         "passport": "X4765274",
     }
 
@@ -951,6 +951,14 @@ async def get_bank_letters(payload: dict = Depends(verify_token)):
                 "country_of_issue": "FRANCE",
                 "date_of_issue": "04.09.2014",
                 "date_of_expiry": "03.09.2024",
+            },
+            {
+                "name": "MR. GABRIEL EGO",
+                "title": "POA Holder/Authorised Signatory (jointly with two)",
+                "origin": "SCHWYZ",
+                "residence": "SEEWEN SZ (SCHWYZ)",
+                "signing_authority": "Authorized to sign jointly with two persons",
+                "country_of_issue": "SWITZERLAND",
             },
         ],
         "references": {
@@ -995,8 +1003,16 @@ async def get_account_profile(payload: dict = Depends(verify_token)):
                 "date_of_issue": "04.09.2014",
                 "date_of_expiry": "03.09.2024",
             },
+            {
+                "name": "MR. GABRIEL EGO",
+                "title": "POA Holder/Authorised Signatory (jointly with two)",
+                "origin": "SCHWYZ",
+                "residence": "SEEWEN SZ (SCHWYZ)",
+                "signing_authority": "Authorized to sign jointly with two persons",
+                "country_of_issue": "SWITZERLAND",
+            },
         ],
-        "declaration": "I, DR. ERICH HUNZIKER & SERGE COTTENCON hereby swear under penalty of perjury, that the information provided herein is accurate and true as of this date.",
+        "declaration": "I, DR. ERICH HUNZIKER, DR. SERGE COTTENCON & MR. GABRIEL EGO hereby swear under penalty of perjury, that the information provided herein is accurate and true as of this date.",
         "bank": {
             "name": "UNION BANK OF SWITZERLAND AG",
             "swift": "UBSWCHZHXXX",

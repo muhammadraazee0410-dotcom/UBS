@@ -208,7 +208,7 @@ const AccountProfilePage = () => {
       </Card>
 
       {/* Signatories */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {signatories.map((sig, idx) => (
           <Card key={idx} className="bg-swiss-bg-paper border-slate-200 rounded-sm overflow-hidden">
             <div className="h-1 bg-gradient-to-r from-swiss-red to-swiss-red/50" />
@@ -225,14 +225,28 @@ const AccountProfilePage = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InfoRow icon={FileText} label="Title" value={sig.title} testId={`sig-${idx}-title`} />
+              <InfoRow icon={FileText} label="Title" value={sig.title} />
+              {sig.signing_authority && (
+                <InfoRow icon={Shield} label="Signing Authority" value={sig.signing_authority} />
+              )}
               <div className="h-px bg-slate-50" />
               <div className="bg-swiss-bg-subtle p-4 rounded-sm space-y-3">
-                <p className="text-[10px] text-swiss-text-muted uppercase tracking-widest mb-2">Passport Details</p>
-                <InfoRow icon={Hash} label="Passport N\u00b0" value={sig.passport_number} testId={`sig-${idx}-passport`} />
-                <InfoRow icon={Globe} label="Country of Issue" value={sig.country_of_issue} testId={`sig-${idx}-country`} />
-                <InfoRow icon={CalendarDays} label="Date of Issue" value={sig.date_of_issue} testId={`sig-${idx}-issued`} />
-                <InfoRow icon={CalendarDays} label="Date of Expiry" value={sig.date_of_expiry} testId={`sig-${idx}-expiry`} />
+                {sig.passport_number ? (
+                  <>
+                    <p className="text-[10px] text-swiss-text-muted uppercase tracking-widest mb-2">Passport Details</p>
+                    <InfoRow icon={Hash} label="Passport N\u00b0" value={sig.passport_number} />
+                    <InfoRow icon={Globe} label="Country of Issue" value={sig.country_of_issue} />
+                    <InfoRow icon={CalendarDays} label="Date of Issue" value={sig.date_of_issue} />
+                    <InfoRow icon={CalendarDays} label="Date of Expiry" value={sig.date_of_expiry} />
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[10px] text-swiss-text-muted uppercase tracking-widest mb-2">Personal Details</p>
+                    {sig.origin && <InfoRow icon={MapPin} label="Origin" value={sig.origin} />}
+                    {sig.residence && <InfoRow icon={MapPin} label="Residence" value={sig.residence} />}
+                    <InfoRow icon={Globe} label="Country" value={sig.country_of_issue} />
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -252,20 +266,18 @@ const AccountProfilePage = () => {
             <thead>
               <tr className="bg-swiss-bg-subtle border-b border-slate-200">
                 <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Authorised By</th>
-                <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Passport No.</th>
-                <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Place of Issue</th>
-                <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Date of Issue</th>
-                <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Date of Expire</th>
+                <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Passport / ID</th>
+                <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Place of Issue / Origin</th>
+                <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Signing Authority</th>
               </tr>
             </thead>
             <tbody>
               {signatories.map((s, i) => (
                 <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
                   <td className="py-3 px-4 text-slate-900 text-sm font-medium">{s.name}</td>
-                  <td className="py-3 px-4 font-mono text-sm text-swiss-text-secondary">{s.passport_number}</td>
-                  <td className="py-3 px-4 text-sm text-swiss-text-secondary">{s.country_of_issue}</td>
-                  <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">{s.date_of_issue}</td>
-                  <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">{s.date_of_expiry}</td>
+                  <td className="py-3 px-4 font-mono text-sm text-swiss-text-secondary">{s.passport_number || '—'}</td>
+                  <td className="py-3 px-4 text-sm text-swiss-text-secondary">{s.origin || s.country_of_issue}</td>
+                  <td className="py-3 px-4 text-xs text-swiss-text-secondary">{s.signing_authority || 'Full signatory authority'}</td>
                 </tr>
               ))}
             </tbody>
@@ -295,13 +307,15 @@ const AccountProfilePage = () => {
           </div>
 
           {/* Signature Blocks */}
-          <div className="grid grid-cols-2 gap-8 mt-8">
+          <div className="grid grid-cols-3 gap-6 mt-8">
             {signatories.map((s, i) => (
               <div key={i} className="text-center">
                 <div className="h-16 border-b-2 border-slate-300 mb-3" />
                 <p className="text-slate-900 font-bold text-sm">{s.name}</p>
                 <p className="text-swiss-text-muted text-xs">{s.title}</p>
-                <p className="text-swiss-text-muted text-xs font-mono mt-1">Passport: {s.passport_number}</p>
+                <p className="text-swiss-text-muted text-xs font-mono mt-1">
+                  {s.passport_number ? `Passport: ${s.passport_number}` : `Origin: ${s.origin}`}
+                </p>
               </div>
             ))}
           </div>

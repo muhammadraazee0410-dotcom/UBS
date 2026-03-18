@@ -106,7 +106,7 @@ const BankLettersPage = () => {
                     {/* Authorised Signatories Section */}
                     <div className="bg-swiss-bg-subtle border border-slate-200 p-5 rounded-sm">
                       <p className="text-[10px] text-swiss-red uppercase tracking-widest mb-4 font-bold">Authorised Signatories</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {sigs && sigs.map((s, i) => (
                           <div key={i} className="bg-swiss-bg-paper border border-slate-100 p-4 rounded-sm">
                             <div className="flex items-center justify-between mb-3">
@@ -117,10 +117,25 @@ const BankLettersPage = () => {
                             </div>
                             <div className="space-y-1.5">
                               <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Title:</span><span className="text-swiss-text-secondary text-xs">{s.title}</span></div>
-                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Passport N°:</span><span className="text-slate-900 text-xs font-mono">{s.passport_number}</span></div>
+                              {s.passport_number && (
+                                <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Passport N°:</span><span className="text-slate-900 text-xs font-mono">{s.passport_number}</span></div>
+                              )}
                               <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Country:</span><span className="text-swiss-text-secondary text-xs">{s.country_of_issue}</span></div>
-                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Issued:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_issue}</span></div>
-                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Expires:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_expiry}</span></div>
+                              {s.origin && (
+                                <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Origin:</span><span className="text-swiss-text-secondary text-xs">{s.origin}</span></div>
+                              )}
+                              {s.residence && (
+                                <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Residence:</span><span className="text-swiss-text-secondary text-xs">{s.residence}</span></div>
+                              )}
+                              {s.date_of_issue && (
+                                <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Issued:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_issue}</span></div>
+                              )}
+                              {s.date_of_expiry && (
+                                <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Expires:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_expiry}</span></div>
+                              )}
+                              {s.signing_authority && (
+                                <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Authority:</span><span className="text-swiss-red text-xs font-medium">{s.signing_authority}</span></div>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -170,16 +185,18 @@ const BankLettersPage = () => {
                     </div>
                   </div>
 
-                  {/* Dual Signatory Block */}
+                  {/* Signatory Block */}
                   <div className="border-t border-slate-200 pt-6 mt-6">
                     <p className="text-xs text-swiss-text-muted mb-6">Authorised and confirmed by:</p>
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-3 gap-6">
                       {sigs && sigs.map((s, i) => (
                         <div key={i} className="text-center">
                           <div className="h-14 border-b-2 border-slate-300 mb-3" />
                           <p className="text-slate-900 font-bold text-sm">{s.name}</p>
                           <p className="text-swiss-text-muted text-xs">{s.title}</p>
-                          <p className="text-swiss-text-muted text-xs font-mono mt-1">Passport: {s.passport_number}</p>
+                          <p className="text-swiss-text-muted text-xs font-mono mt-1">
+                            {s.passport_number ? `Passport: ${s.passport_number}` : `Origin: ${s.origin}`}
+                          </p>
                         </div>
                       ))}
                     </div>
