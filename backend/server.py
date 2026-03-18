@@ -897,6 +897,107 @@ async def get_collection_data(collection: str, limit: int = 50, payload: dict = 
     docs = await db[collection].find({}, {"_id": 0}).to_list(limit)
     return docs
 
+# ================ CIS (Customer Information Sheet) ================
+
+@api_router.get("/cis")
+async def get_cis(payload: dict = Depends(verify_token)):
+    now = datetime.now(timezone.utc)
+    ref_base = now.strftime("%Y%m%d")
+
+    balances_data = []
+    for cur, acct in STATIC_BALANCES.items():
+        balances_data.append({
+            "currency": cur,
+            "balance": acct["balance"],
+            "account_number": acct["account_number"],
+            "iban": acct["iban"],
+        })
+
+    return {
+        "date": now.isoformat(),
+        "reference": f"UBS/CIS/{ref_base}/001",
+        "bank": {
+            "name": "UNION BANK OF SWITZERLAND AG",
+            "short_name": "UBS",
+            "swift": "UBSWCHZHXXX",
+            "bic": "UBSWCHZH80A",
+            "address": "Bahnhofstrasse 45, 8001 Zurich, Switzerland",
+            "phone": "+41 44 234 1111",
+            "fax": "+41 44 234 3399",
+            "website": "www.ubs.com",
+            "regulator": "Swiss Financial Market Supervisory Authority (FINMA)",
+            "bank_license": "Issued 29 June 1998",
+        },
+        "client": {
+            "name": "BB BIOTECH AG",
+            "id_number": "CHE-102.169.627",
+            "legal_form": "Aktiengesellschaft (AG) / Public Limited Company",
+            "address": "Schwertstrasse 6, 8200 Schaffhausen, Zurich, Switzerland",
+            "domicile": "Schaffhausen, Switzerland",
+            "date_of_incorporation": "09 November 1993",
+            "purpose": "Investment company specialising in the biotechnology sector",
+            "listed_exchange": "SIX Swiss Exchange (Ticker: BION)",
+            "sector": "Healthcare / Biotechnology Investments",
+            "tax_domicile": "Switzerland",
+            "vat_number": "CHE-102.169.627 MWST",
+            "lei": "5493007YRWSIH4POTF83",
+        },
+        "relationship": {
+            "account_opened": "15 January 2008",
+            "relationship_manager": "MR. JOHANNES WEBER",
+            "rm_title": "Senior Vice President, Private Banking",
+            "rm_department": "Institutional & Corporate Clients Division",
+            "rm_id": "JW-" + now.strftime("%y") + "-4821",
+            "rm_phone": "+41 44 234 4821",
+            "rm_email": "johannes.weber@ubs.com",
+            "client_segment": "Institutional - Corporate",
+            "risk_rating": "Low",
+            "kyc_status": "Verified",
+            "kyc_last_review": "15 January 2024",
+            "kyc_next_review": "15 January 2025",
+            "aml_status": "Compliant",
+            "fatca_status": "Compliant (Non-US Entity)",
+            "crs_status": "Reporting - Switzerland",
+            "pep_status": "Not a PEP",
+        },
+        "signatories": [
+            {
+                "name": "DR. ERICH HUNZIKER",
+                "title": "POA Holder/Authorised Signatory",
+                "passport_number": "X4765274",
+                "country_of_issue": "SWITZERLAND",
+                "nationality": "Swiss",
+            },
+            {
+                "name": "DR. SERGE COTTENCON",
+                "title": "POA Holder/Authorised Signatory",
+                "passport_number": "14DA52103",
+                "country_of_issue": "FRANCE",
+                "nationality": "French",
+            },
+            {
+                "name": "MR. GABRIEL EGO",
+                "title": "POA Holder/Authorised Signatory (jointly with two)",
+                "origin": "Schwyz",
+                "residence": "Seewen SZ (Schwyz)",
+                "country_of_issue": "SWITZERLAND",
+                "nationality": "Swiss",
+                "signing_authority": "Jointly with two",
+            },
+        ],
+        "accounts": balances_data,
+        "services": [
+            "Current Accounts (Multi-Currency)",
+            "International Wire Transfers (SWIFT MT103 / PACS.008 / PACS.009)",
+            "SWIFT GPI Payments",
+            "Documentary Credits",
+            "Foreign Exchange Services",
+            "Securities Custody",
+            "Cash Management",
+            "Online Banking (UBS e-Banking)",
+        ],
+    }
+
 # ================ BANK LETTERS ================
 
 @api_router.get("/bank-letters")

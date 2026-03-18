@@ -36,6 +36,7 @@ const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/account-profile', label: 'Account Profile', icon: Building },
   { path: '/bank-letters', label: 'Bank Letters', icon: Mail },
+  { path: '/cis', label: 'CIS Document', icon: FileText },
   { path: '/international-transfer', label: 'International Transfer', icon: Globe },
   { path: '/domestic-transfer', label: 'Domestic Transfer', icon: Building2 },
   { path: '/bill-payment', label: 'Bill Payment', icon: Receipt },
