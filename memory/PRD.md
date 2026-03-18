@@ -19,7 +19,13 @@ CREATE UNION BANK OF SWITZERLAND AG BANK ADMIN PORTAL WITH INCLUDES ALL BANKING 
 - **Design**: Swiss Vault dark theme with Swiss red accents
 - **PDF Generation**: Client-side via window.open + print (jspdf/html2canvas available)
 
-## Default Credentials
+## Design Theme
+- **Background**: White (#FFFFFF)
+- **Text**: Dark/Black (slate-900)
+- **Sidebar**: Dark (slate-900) with light text
+- **Accent**: Swiss Red (#DC2626)
+- **Cards**: Light gray (#F8FAFC)
+- **Borders**: Slate-200
 - Email: admin@ubs.ch
 - Password: UBS@2024
 

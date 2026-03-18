@@ -72,10 +72,10 @@ const BillPaymentPage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="bill-payment-page">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+        <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
           <Receipt className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
           Bill Payment
         </h1>
@@ -86,9 +86,9 @@ const BillPaymentPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Payment Form */}
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardHeader>
-            <CardTitle className="font-heading text-lg text-white">
+            <CardTitle className="font-heading text-lg text-slate-900">
               New Bill Payment
             </CardTitle>
           </CardHeader>
@@ -102,9 +102,8 @@ const BillPaymentPage = () => {
                 <Input
                   value={formData.biller_name}
                   onChange={(e) => setFormData({ ...formData, biller_name: e.target.value })}
-                  className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11"
+                  className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11"
                   placeholder="Swiss Electric Company"
-                  data-testid="biller-name"
                   required
                 />
               </div>
@@ -117,9 +116,8 @@ const BillPaymentPage = () => {
                 <Input
                   value={formData.biller_account}
                   onChange={(e) => setFormData({ ...formData, biller_account: e.target.value })}
-                  className="bg-swiss-bg-subtle border-white/10 text-white font-mono rounded-sm h-11"
+                  className="bg-swiss-bg-subtle border-slate-200 text-slate-900 font-mono rounded-sm h-11"
                   placeholder="CH93 0027 3001 8839 9039 39"
-                  data-testid="biller-account"
                   required
                 />
               </div>
@@ -135,9 +133,8 @@ const BillPaymentPage = () => {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="bg-swiss-bg-subtle border-white/10 text-white font-mono rounded-sm h-11"
+                    className="bg-swiss-bg-subtle border-slate-200 text-slate-900 font-mono rounded-sm h-11"
                     placeholder="0.00"
-                    data-testid="bill-amount"
                     required
                   />
                 </div>
@@ -149,10 +146,10 @@ const BillPaymentPage = () => {
                     value={formData.currency}
                     onValueChange={(value) => setFormData({ ...formData, currency: value })}
                   >
-                    <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="bill-currency">
+                    <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-swiss-bg-paper border-white/10">
+                    <SelectContent className="bg-swiss-bg-paper border-slate-200">
                       <SelectItem value="CHF">CHF</SelectItem>
                       <SelectItem value="EUR">EUR</SelectItem>
                       <SelectItem value="USD">USD</SelectItem>
@@ -169,9 +166,8 @@ const BillPaymentPage = () => {
                 <Input
                   value={formData.reference}
                   onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                  className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11"
+                  className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11"
                   placeholder="Invoice #12345"
-                  data-testid="bill-reference"
                   required
                 />
               </div>
@@ -180,7 +176,6 @@ const BillPaymentPage = () => {
                 type="submit"
                 disabled={loading}
                 className="w-full h-12 bg-swiss-red hover:bg-swiss-red-hover text-white font-medium uppercase tracking-wider rounded-sm"
-                data-testid="submit-bill-payment"
               >
                 {loading ? (
                   <>
@@ -199,9 +194,9 @@ const BillPaymentPage = () => {
         </Card>
 
         {/* Payment History */}
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+            <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
               <History className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
               Recent Payments
             </CardTitle>
@@ -225,11 +220,11 @@ const BillPaymentPage = () => {
                   {payments.map((payment) => (
                     <div
                       key={payment.id}
-                      className="p-4 bg-swiss-bg-subtle/50 rounded-sm border border-white/5"
+                      className="p-4 bg-swiss-bg-subtle/50 rounded-sm border border-slate-100"
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <p className="text-white font-medium">{payment.biller_name}</p>
+                          <p className="text-slate-900 font-medium">{payment.biller_name}</p>
                           <p className="text-xs text-swiss-text-muted font-mono">{payment.biller_account}</p>
                         </div>
                         <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm text-xs">
@@ -242,7 +237,7 @@ const BillPaymentPage = () => {
                           <p className="text-xs text-swiss-text-muted">Reference</p>
                           <p className="text-sm text-swiss-text-secondary">{payment.reference}</p>
                         </div>
-                        <p className="font-mono text-lg text-white">
+                        <p className="font-mono text-lg text-slate-900">
                           {formatCurrency(payment.amount, payment.currency)}
                         </p>
                       </div>

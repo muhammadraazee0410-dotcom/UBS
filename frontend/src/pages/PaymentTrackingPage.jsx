@@ -60,13 +60,13 @@ const PaymentTrackingPage = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'initiated':
-        return 'bg-blue-500 text-white';
+        return 'bg-blue-500 text-slate-900';
       case 'processing':
-        return 'bg-amber-500 text-white';
+        return 'bg-amber-500 text-slate-900';
       case 'in_transit':
-        return 'bg-purple-500 text-white';
+        return 'bg-purple-500 text-slate-900';
       case 'delivered':
-        return 'bg-swiss-status-success text-white';
+        return 'bg-swiss-status-success text-slate-900';
       default:
         return 'bg-swiss-bg-subtle text-swiss-text-secondary';
     }
@@ -80,10 +80,10 @@ const PaymentTrackingPage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="payment-tracking-page">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+        <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
           <MapPin className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
           Payment Tracking
         </h1>
@@ -93,7 +93,7 @@ const PaymentTrackingPage = () => {
       </div>
 
       {/* Search Card */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardContent className="p-6">
           <form onSubmit={handleTrack} className="flex gap-4">
             <div className="flex-1">
@@ -103,9 +103,8 @@ const PaymentTrackingPage = () => {
               <Input
                 value={trackingId}
                 onChange={(e) => setTrackingId(e.target.value)}
-                className="bg-swiss-bg-subtle border-white/10 text-white font-mono rounded-sm h-12"
+                className="bg-swiss-bg-subtle border-slate-200 text-slate-900 font-mono rounded-sm h-12"
                 placeholder="GPI12345678901234567890"
-                data-testid="tracking-input"
               />
             </div>
             <div className="flex items-end">
@@ -113,7 +112,6 @@ const PaymentTrackingPage = () => {
                 type="submit"
                 disabled={loading}
                 className="h-12 px-8 bg-swiss-red hover:bg-swiss-red-hover text-white font-medium uppercase tracking-wider rounded-sm"
-                data-testid="track-btn"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -133,16 +131,16 @@ const PaymentTrackingPage = () => {
       {trackingData && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Transfer Details */}
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm lg:col-span-1">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm lg:col-span-1">
             <CardHeader>
-              <CardTitle className="font-heading text-lg text-white">
+              <CardTitle className="font-heading text-lg text-slate-900">
                 Transfer Details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 bg-swiss-bg-subtle rounded-sm">
                 <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Amount</p>
-                <p className="font-mono text-2xl text-white">
+                <p className="font-mono text-2xl text-slate-900">
                   {formatCurrency(trackingData.transfer.amount, trackingData.transfer.currency)}
                 </p>
               </div>
@@ -156,7 +154,7 @@ const PaymentTrackingPage = () => {
                 </div>
                 <div>
                   <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Beneficiary</p>
-                  <p className="text-white">{trackingData.transfer.beneficiary_name}</p>
+                  <p className="text-slate-900">{trackingData.transfer.beneficiary_name}</p>
                 </div>
                 <div>
                   <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">IBAN</p>
@@ -175,9 +173,9 @@ const PaymentTrackingPage = () => {
           </Card>
 
           {/* Tracking Timeline */}
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm lg:col-span-2">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm lg:col-span-2">
             <CardHeader>
-              <CardTitle className="font-heading text-lg text-white flex items-center justify-between">
+              <CardTitle className="font-heading text-lg text-slate-900 flex items-center justify-between">
                 <span>Tracking Timeline</span>
                 <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm">
                   <CheckCircle2 className="w-3 h-3 mr-1" />
@@ -203,7 +201,7 @@ const PaymentTrackingPage = () => {
                         <div className="flex-1 pb-6">
                           <div className="flex items-start justify-between">
                             <div>
-                              <p className="text-white font-medium capitalize">{item.status.replace('_', ' ')}</p>
+                              <p className="text-slate-900 font-medium capitalize">{item.status.replace('_', ' ')}</p>
                               <p className="text-swiss-text-secondary text-sm">{item.description}</p>
                             </div>
                             <p className="font-mono text-xs text-swiss-text-muted">
@@ -227,12 +225,12 @@ const PaymentTrackingPage = () => {
 
       {/* Empty State */}
       {!trackingData && !loading && (
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="w-20 h-20 rounded-full bg-swiss-bg-subtle flex items-center justify-center mb-6">
               <MapPin className="w-10 h-10 text-swiss-text-muted" strokeWidth={1} />
             </div>
-            <h3 className="font-heading text-xl text-white mb-2">Track Your Payment</h3>
+            <h3 className="font-heading text-xl text-slate-900 mb-2">Track Your Payment</h3>
             <p className="text-swiss-text-muted text-center max-w-md">
               Enter your GPI tracking ID or UETR to track the status of your international payment in real-time.
             </p>

@@ -60,21 +60,21 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-swiss-bg flex">
+    <div className="min-h-screen bg-white flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-swiss-bg-paper border-r border-white/10 transition-all duration-300 ${
+        className={`fixed inset-y-0 left-0 z-50 bg-slate-900 border-r border-slate-800 transition-all duration-300 ${
           sidebarOpen ? 'w-64' : 'w-20'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
+          <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
             {sidebarOpen && (
               <div className="flex items-center gap-3">
                 <UBSLogo className="h-8 w-auto text-white" />
                 <div>
-                  <p className="text-[10px] text-swiss-text-muted uppercase tracking-widest">Admin Portal</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-widest">Admin Portal</p>
                 </div>
               </div>
             )}
@@ -82,8 +82,7 @@ const Layout = ({ children }) => {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-swiss-text-secondary hover:text-white hover:bg-white/5"
-              data-testid="sidebar-toggle"
+              className="text-slate-400 hover:text-white hover:bg-white/10"
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
@@ -99,11 +98,10 @@ const Layout = ({ children }) => {
                   <Link
                     key={item.path}
                     to={item.path}
-                    data-testid={`nav-${item.path.slice(1)}`}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-sm transition-all group ${
                       isActive
                         ? 'bg-swiss-red text-white'
-                        : 'text-swiss-text-secondary hover:text-white hover:bg-white/5'
+                        : 'text-slate-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" strokeWidth={1.5} />
@@ -120,26 +118,25 @@ const Layout = ({ children }) => {
           </ScrollArea>
 
           {/* User section */}
-          <div className="p-4 border-t border-white/10">
+          <div className="p-4 border-t border-slate-800">
             {sidebarOpen ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-sm bg-swiss-bg-subtle flex items-center justify-center">
-                    <span className="text-xs font-mono text-swiss-text-secondary">
+                  <div className="w-8 h-8 rounded-sm bg-slate-800 flex items-center justify-center">
+                    <span className="text-xs font-mono text-slate-400">
                       {user?.full_name?.charAt(0) || 'A'}
                     </span>
                   </div>
                   <div>
                     <p className="text-sm text-white font-medium">{user?.full_name}</p>
-                    <p className="text-xs text-swiss-text-muted">{user?.role}</p>
+                    <p className="text-xs text-slate-500">{user?.role}</p>
                   </div>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleLogout}
-                  className="text-swiss-text-secondary hover:text-swiss-red hover:bg-white/5"
-                  data-testid="logout-btn"
+                  className="text-slate-400 hover:text-swiss-red hover:bg-white/10"
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>
@@ -149,8 +146,7 @@ const Layout = ({ children }) => {
                 variant="ghost"
                 size="icon"
                 onClick={handleLogout}
-                className="w-full text-swiss-text-secondary hover:text-swiss-red hover:bg-white/5"
-                data-testid="logout-btn-collapsed"
+                className="w-full text-slate-400 hover:text-swiss-red hover:bg-white/10"
               >
                 <LogOut className="w-5 h-5" />
               </Button>

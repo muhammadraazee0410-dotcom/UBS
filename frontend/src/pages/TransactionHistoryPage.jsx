@@ -292,11 +292,11 @@ const TransactionHistoryPage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="transaction-history-page">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
             <History className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             Transaction History
           </h1>
@@ -307,8 +307,7 @@ const TransactionHistoryPage = () => {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm"
-            data-testid="export-transactions"
+            className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm"
           >
             <Download className="w-4 h-4 mr-2" />
             Export
@@ -316,8 +315,7 @@ const TransactionHistoryPage = () => {
           <Button
             onClick={fetchTransactions}
             variant="outline"
-            className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm"
-            data-testid="refresh-transactions"
+            className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
@@ -325,7 +323,7 @@ const TransactionHistoryPage = () => {
       </div>
 
       {/* Filters */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
@@ -333,17 +331,16 @@ const TransactionHistoryPage = () => {
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-10"
+                className="pl-10 bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-10"
                 placeholder="Search transactions..."
-                data-testid="search-transactions"
               />
             </div>
             <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[200px] bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-10" data-testid="filter-type">
+              <SelectTrigger className="w-[200px] bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-10">
                 <Filter className="w-4 h-4 mr-2 text-swiss-text-muted" />
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
-              <SelectContent className="bg-swiss-bg-paper border-white/10">
+              <SelectContent className="bg-swiss-bg-paper border-slate-200">
                 <SelectItem value="all">All Transactions</SelectItem>
                 <SelectItem value="INTL_MT103">International MT103</SelectItem>
                 <SelectItem value="INTL_PACS008">International PACS.008</SelectItem>
@@ -358,9 +355,9 @@ const TransactionHistoryPage = () => {
       </Card>
 
       {/* Transactions Table */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardHeader>
-          <CardTitle className="font-heading text-lg text-white flex items-center justify-between">
+          <CardTitle className="font-heading text-lg text-slate-900 flex items-center justify-between">
             <span>Transactions</span>
             <Badge className="bg-swiss-bg-subtle text-swiss-text-secondary rounded-sm">
               {filteredTransactions.length} records
@@ -381,7 +378,7 @@ const TransactionHistoryPage = () => {
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow className="border-white/10 hover:bg-transparent">
+                  <TableRow className="border-slate-200 hover:bg-transparent">
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Date</TableHead>
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Type</TableHead>
                     <TableHead className="text-swiss-text-muted uppercase text-xs tracking-wider">Description</TableHead>
@@ -393,7 +390,7 @@ const TransactionHistoryPage = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredTransactions.map((tx) => (
-                    <TableRow key={tx.id} className="border-white/5 hover:bg-white/5">
+                    <TableRow key={tx.id} className="border-slate-100 hover:bg-slate-100">
                       <TableCell className="font-mono text-xs text-swiss-text-secondary">
                         {new Date(tx.created_at).toLocaleDateString()}
                       </TableCell>
@@ -402,7 +399,7 @@ const TransactionHistoryPage = () => {
                           {tx.transaction_type}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-white text-sm max-w-[200px] truncate">
+                      <TableCell className="text-slate-900 text-sm max-w-[200px] truncate">
                         {tx.description}
                       </TableCell>
                       <TableCell className="font-mono text-xs text-swiss-text-muted">
@@ -430,8 +427,7 @@ const TransactionHistoryPage = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => viewReceipt(tx)}
-                          className="text-swiss-text-secondary hover:text-white hover:bg-swiss-red/20"
-                          data-testid={`view-receipt-${tx.id}`}
+                          className="text-swiss-text-secondary hover:text-slate-900 hover:bg-swiss-red/20"
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           View
@@ -448,15 +444,14 @@ const TransactionHistoryPage = () => {
 
       {/* Receipt Modal */}
       <Dialog open={receiptOpen} onOpenChange={setReceiptOpen}>
-        <DialogContent className="bg-swiss-bg-paper border-white/10 max-w-3xl max-h-[90vh] overflow-hidden">
+        <DialogContent className="bg-swiss-bg-paper border-slate-200 max-w-3xl max-h-[90vh] overflow-hidden">
           <DialogHeader className="flex flex-row items-center justify-between">
-            <DialogTitle className="font-heading text-xl text-white">Transaction Receipt</DialogTitle>
+            <DialogTitle className="font-heading text-xl text-slate-900">Transaction Receipt</DialogTitle>
             <Button
               variant="ghost"
               size="sm"
               onClick={printReceipt}
-              className="text-swiss-text-secondary hover:text-white hover:bg-swiss-red/20"
-              data-testid="print-receipt-btn"
+              className="text-swiss-text-secondary hover:text-slate-900 hover:bg-swiss-red/20"
             >
               <Printer className="w-4 h-4 mr-1" />
               Print PDF
@@ -467,7 +462,7 @@ const TransactionHistoryPage = () => {
             <ScrollArea className="h-[70vh] pr-4">
               <div className="space-y-4 font-mono text-xs">
                 {/* Header */}
-                <div className="flex justify-between items-center border-b-2 border-white/20 pb-4">
+                <div className="flex justify-between items-center border-b-2 border-slate-300 pb-4">
                   <div className="flex items-center gap-4">
                     <span className="text-2xl font-bold text-swiss-red">UBS</span>
                     <span className="text-sm uppercase tracking-wider">MT103 ANSWER BACK - TARGET2 CLEARING ACKNOWLEDGMENT</span>
@@ -482,52 +477,52 @@ const TransactionHistoryPage = () => {
 
                 {/* Transaction Reference */}
                 <div className="bg-swiss-bg-subtle p-4 rounded-sm">
-                  <h3 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-white/10 pb-2 text-center">Transaction Reference</h3>
+                  <h3 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-slate-200 pb-2 text-center">Transaction Reference</h3>
                   <div className="grid grid-cols-2 gap-2">
                     <span className="text-swiss-text-muted">TRN:</span>
-                    <span className="text-white font-bold">UBS{Date.now().toString().substring(0, 13)}</span>
+                    <span className="text-slate-900 font-bold">UBS{Date.now().toString().substring(0, 13)}</span>
                     <span className="text-swiss-text-muted">UETR:</span>
-                    <span className="text-white">{`${Math.random().toString(36).substring(2, 10)}-${Math.random().toString(36).substring(2, 6)}-4b32c873cd3b`}</span>
+                    <span className="text-slate-900">{`${Math.random().toString(36).substring(2, 10)}-${Math.random().toString(36).substring(2, 6)}-4b32c873cd3b`}</span>
                     <span className="text-swiss-text-muted">MUR:</span>
-                    <span className="text-white">0{Math.floor(Math.random() * 9999999999999)}</span>
+                    <span className="text-slate-900">0{Math.floor(Math.random() * 9999999999999)}</span>
                     <span className="text-swiss-text-muted">Transaction Amount:</span>
                     <span className={`font-bold ${selectedTx.amount < 0 ? 'text-red-400' : 'text-green-400'}`}>
                       {selectedTx.currency} {Math.abs(selectedTx.amount).toLocaleString('en-US', {minimumFractionDigits: 2})} (PENDING TARGET2 CLEARING)
                     </span>
                     <span className="text-swiss-text-muted">Value Date:</span>
-                    <span className="text-white">{new Date(selectedTx.created_at).toLocaleDateString('en-GB')} (SETTLEMENT)</span>
+                    <span className="text-slate-900">{new Date(selectedTx.created_at).toLocaleDateString('en-GB')} (SETTLEMENT)</span>
                   </div>
                 </div>
 
                 {/* Processing Timestamps */}
                 <div className="bg-swiss-bg-subtle p-4 rounded-sm">
-                  <h3 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-white/10 pb-2 text-center">Processing Timestamps</h3>
+                  <h3 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-slate-200 pb-2 text-center">Processing Timestamps</h3>
                   <div className="grid grid-cols-2 gap-2">
                     <span className="text-swiss-text-muted">Creation Time:</span>
-                    <span className="text-white">{new Date(selectedTx.created_at).toISOString().replace('T', ' ').substring(0, 19)}Z</span>
+                    <span className="text-slate-900">{new Date(selectedTx.created_at).toISOString().replace('T', ' ').substring(0, 19)}Z</span>
                     <span className="text-swiss-text-muted">TARGET2 ACK Time:</span>
-                    <span className="text-white">{new Date(new Date(selectedTx.created_at).getTime() + 40000).toISOString().replace('T', ' ').substring(0, 19)}Z</span>
+                    <span className="text-slate-900">{new Date(new Date(selectedTx.created_at).getTime() + 40000).toISOString().replace('T', ' ').substring(0, 19)}Z</span>
                     <span className="text-swiss-text-muted">Processing Duration:</span>
-                    <span className="text-white">40.000 SECONDS (TO TARGET2)</span>
+                    <span className="text-slate-900">40.000 SECONDS (TO TARGET2)</span>
                   </div>
                 </div>
 
                 {/* Network Confirmation */}
                 <div className="bg-swiss-bg-subtle p-4 rounded-sm">
-                  <h3 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-white/10 pb-2 text-center">Network Confirmation</h3>
+                  <h3 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-slate-200 pb-2 text-center">Network Confirmation</h3>
                   <div className="grid grid-cols-2 gap-2">
                     <span className="text-swiss-text-muted">SWIFT Network Status:</span>
-                    <span className="text-white">MESSAGE ACKNOWLEDGED - SUBMITTED TO TARGET2</span>
+                    <span className="text-slate-900">MESSAGE ACKNOWLEDGED - SUBMITTED TO TARGET2</span>
                     <span className="text-swiss-text-muted">Delivery Status:</span>
-                    <span className="text-white">DELIVERED TO TARGET2 FOR CLEARING</span>
+                    <span className="text-slate-900">DELIVERED TO TARGET2 FOR CLEARING</span>
                     <span className="text-swiss-text-muted">Settlement Pipeline:</span>
-                    <span className="text-white">TARGET2 [CONFIRMED] → UBSWCHZHXXX [PENDING]</span>
+                    <span className="text-slate-900">TARGET2 [CONFIRMED] → UBSWCHZHXXX [PENDING]</span>
                     <span className="text-swiss-text-muted">Technical Validation:</span>
                     <span className="text-green-400">PASSED</span>
                     <span className="text-swiss-text-muted">Business Validation:</span>
                     <span className="text-green-400">PASSED</span>
                     <span className="text-swiss-text-muted">Settlement Status:</span>
-                    <span className="text-white">SUBMITTED TO SWIFT FOR CROSS-BORDER SETTLEMENT</span>
+                    <span className="text-slate-900">SUBMITTED TO SWIFT FOR CROSS-BORDER SETTLEMENT</span>
                     <span className="text-swiss-text-muted">Tracker Status:</span>
                     <span className="text-green-400">ACTIVE</span>
                   </div>
@@ -535,35 +530,35 @@ const TransactionHistoryPage = () => {
 
                 {/* Settlement Confirmation */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-swiss-bg-subtle p-4 rounded-sm border border-white/10">
-                    <h4 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-white/10 pb-2">Sender Confirmation</h4>
+                  <div className="bg-swiss-bg-subtle p-4 rounded-sm border border-slate-200">
+                    <h4 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-slate-200 pb-2">Sender Confirmation</h4>
                     <div className="space-y-2">
-                      <div className="flex justify-between"><span className="text-swiss-text-muted">Debit Status:</span><span className="text-white">COMPLETED</span></div>
-                      <div className="flex justify-between"><span className="text-swiss-text-muted">Debit Time:</span><span className="text-white">{new Date(selectedTx.created_at).toISOString().substring(0, 19)}Z</span></div>
-                      <div className="flex justify-between"><span className="text-swiss-text-muted">TARGET2:</span><span className="text-white">SUBMITTED</span></div>
+                      <div className="flex justify-between"><span className="text-swiss-text-muted">Debit Status:</span><span className="text-slate-900">COMPLETED</span></div>
+                      <div className="flex justify-between"><span className="text-swiss-text-muted">Debit Time:</span><span className="text-slate-900">{new Date(selectedTx.created_at).toISOString().substring(0, 19)}Z</span></div>
+                      <div className="flex justify-between"><span className="text-swiss-text-muted">TARGET2:</span><span className="text-slate-900">SUBMITTED</span></div>
                     </div>
                   </div>
-                  <div className="bg-swiss-bg-subtle p-4 rounded-sm border border-white/10">
-                    <h4 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-white/10 pb-2">Receiver Confirmation</h4>
+                  <div className="bg-swiss-bg-subtle p-4 rounded-sm border border-slate-200">
+                    <h4 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-3 border-b border-slate-200 pb-2">Receiver Confirmation</h4>
                     <div className="space-y-2">
                       <div className="flex justify-between"><span className="text-swiss-text-muted">Credit Status:</span><span className="text-amber-400">PENDING</span></div>
-                      <div className="flex justify-between"><span className="text-swiss-text-muted">Expected:</span><span className="text-white">{new Date(new Date(selectedTx.created_at).getTime() + 86400000).toISOString().substring(0, 10)}</span></div>
-                      <div className="flex justify-between"><span className="text-swiss-text-muted">Notification:</span><span className="text-white">PROCESSING</span></div>
+                      <div className="flex justify-between"><span className="text-swiss-text-muted">Expected:</span><span className="text-slate-900">{new Date(new Date(selectedTx.created_at).getTime() + 86400000).toISOString().substring(0, 10)}</span></div>
+                      <div className="flex justify-between"><span className="text-swiss-text-muted">Notification:</span><span className="text-slate-900">PROCESSING</span></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Confirmation Status */}
-                <div className="border-2 border-white/20 p-4 text-center bg-swiss-bg-subtle">
+                <div className="border-2 border-slate-300 p-4 text-center bg-swiss-bg-subtle">
                   <h3 className="text-swiss-text-muted text-[10px] uppercase tracking-widest mb-2">Confirmation Status</h3>
-                  <p className="text-white text-sm">THIS ACKNOWLEDGMENT CONFIRMS THAT THE MT103 MESSAGE HAS BEEN</p>
-                  <p className="text-white text-sm">SUCCESSFULLY RECEIVED AND ACCEPTED BY TARGET2 FOR CLEARING</p>
-                  <p className="text-white text-sm">TO THE BENEFICIARY BANK VIA SWIFT NETWORK</p>
+                  <p className="text-slate-900 text-sm">THIS ACKNOWLEDGMENT CONFIRMS THAT THE MT103 MESSAGE HAS BEEN</p>
+                  <p className="text-slate-900 text-sm">SUCCESSFULLY RECEIVED AND ACCEPTED BY TARGET2 FOR CLEARING</p>
+                  <p className="text-slate-900 text-sm">TO THE BENEFICIARY BANK VIA SWIFT NETWORK</p>
                   <p className="text-swiss-text-secondary text-xs mt-3">REFERENCE: {selectedTx.reference} | STATUS: <span className="text-green-400">ACKNOWLEDGED BY TARGET2</span></p>
                 </div>
 
                 {/* Footer */}
-                <div className="text-center pt-4 border-t border-white/20">
+                <div className="text-center pt-4 border-t border-slate-300">
                   <p className="text-swiss-text-muted text-[10px]">MT103 ANSWER BACK - TARGET2 CLEARING ACKNOWLEDGMENT | GENERATED: {new Date().toISOString()}</p>
                   <p className="text-swiss-text-muted text-[10px]">POWERED BY: UNION BANK OF SWITZERLAND AG SWIFT PROCESSING SYSTEM</p>
                   <div className="mt-4 font-mono tracking-widest text-swiss-text-muted">

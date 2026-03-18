@@ -72,10 +72,10 @@ const DomesticTransferPage = () => {
   const selectedBeneficiary = beneficiaries.find(b => b.id === formData.beneficiary_id);
 
   return (
-    <div className="space-y-6" data-testid="domestic-transfer-page">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+        <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
           <Building2 className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
           Domestic Transfer
         </h1>
@@ -86,9 +86,9 @@ const DomesticTransferPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Transfer Form */}
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardHeader>
-            <CardTitle className="font-heading text-lg text-white">
+            <CardTitle className="font-heading text-lg text-slate-900">
               New Domestic Transfer
             </CardTitle>
           </CardHeader>
@@ -105,9 +105,8 @@ const DomesticTransferPage = () => {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="bg-swiss-bg-subtle border-white/10 text-white font-mono rounded-sm h-11"
+                    className="bg-swiss-bg-subtle border-slate-200 text-slate-900 font-mono rounded-sm h-11"
                     placeholder="0.00"
-                    data-testid="domestic-amount"
                     required
                   />
                 </div>
@@ -119,10 +118,10 @@ const DomesticTransferPage = () => {
                     value={formData.currency}
                     onValueChange={(value) => setFormData({ ...formData, currency: value })}
                   >
-                    <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="domestic-currency">
+                    <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-swiss-bg-paper border-white/10">
+                    <SelectContent className="bg-swiss-bg-paper border-slate-200">
                       <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
                       <SelectItem value="EUR">EUR - Euro</SelectItem>
                     </SelectContent>
@@ -139,10 +138,10 @@ const DomesticTransferPage = () => {
                   value={formData.sender_account}
                   onValueChange={(value) => setFormData({ ...formData, sender_account: value })}
                 >
-                  <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="domestic-sender">
+                  <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11">
                     <SelectValue placeholder="Select account" />
                   </SelectTrigger>
-                  <SelectContent className="bg-swiss-bg-paper border-white/10">
+                  <SelectContent className="bg-swiss-bg-paper border-slate-200">
                     {balances.map((bal) => (
                       <SelectItem key={bal.iban} value={bal.iban}>
                         <span className="font-mono text-sm">{bal.iban}</span>
@@ -162,10 +161,10 @@ const DomesticTransferPage = () => {
                   value={formData.beneficiary_id}
                   onValueChange={(value) => setFormData({ ...formData, beneficiary_id: value })}
                 >
-                  <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="domestic-beneficiary">
+                  <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11">
                     <SelectValue placeholder="Select beneficiary" />
                   </SelectTrigger>
-                  <SelectContent className="bg-swiss-bg-paper border-white/10">
+                  <SelectContent className="bg-swiss-bg-paper border-slate-200">
                     {beneficiaries.length === 0 ? (
                       <div className="p-2 text-sm text-swiss-text-muted">
                         No beneficiaries. Add one first.
@@ -189,9 +188,8 @@ const DomesticTransferPage = () => {
                 <Input
                   value={formData.reference}
                   onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                  className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11"
+                  className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11"
                   placeholder="Invoice #12345"
-                  data-testid="domestic-reference"
                   required
                 />
               </div>
@@ -200,7 +198,6 @@ const DomesticTransferPage = () => {
                 type="submit"
                 disabled={loading || beneficiaries.length === 0}
                 className="w-full h-12 bg-swiss-red hover:bg-swiss-red-hover text-white font-medium uppercase tracking-wider rounded-sm"
-                data-testid="submit-domestic-transfer"
               >
                 {loading ? (
                   <>
@@ -219,9 +216,9 @@ const DomesticTransferPage = () => {
         </Card>
 
         {/* Transfer Summary / Success */}
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardHeader>
-            <CardTitle className="font-heading text-lg text-white">
+            <CardTitle className="font-heading text-lg text-slate-900">
               Transfer Summary
             </CardTitle>
           </CardHeader>
@@ -234,13 +231,13 @@ const DomesticTransferPage = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <p className="text-xl font-heading font-bold text-white">Transfer Completed</p>
+                  <p className="text-xl font-heading font-bold text-slate-900">Transfer Completed</p>
                   <p className="text-swiss-text-muted text-sm mt-1">Transaction processed successfully</p>
                 </div>
                 <div className="space-y-3 bg-swiss-bg-subtle p-4 rounded-sm">
                   <div className="flex justify-between">
                     <span className="text-swiss-text-muted text-sm">Tracking ID</span>
-                    <span className="font-mono text-sm text-white">{success.tracking_id}</span>
+                    <span className="font-mono text-sm text-slate-900">{success.tracking_id}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-swiss-text-muted text-sm">Status</span>
@@ -252,14 +249,14 @@ const DomesticTransferPage = () => {
               <div className="space-y-4">
                 <div className="p-4 bg-swiss-bg-subtle rounded-sm">
                   <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-2">Beneficiary Details</p>
-                  <p className="text-white font-medium">{selectedBeneficiary.name}</p>
+                  <p className="text-slate-900 font-medium">{selectedBeneficiary.name}</p>
                   <p className="text-swiss-text-secondary text-sm">{selectedBeneficiary.bank_name}</p>
                   <p className="font-mono text-xs text-swiss-text-muted mt-2">{selectedBeneficiary.iban}</p>
                 </div>
                 {formData.amount && (
                   <div className="p-4 bg-swiss-bg-subtle rounded-sm">
                     <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-2">Amount</p>
-                    <p className="font-mono text-2xl text-white">
+                    <p className="font-mono text-2xl text-slate-900">
                       {formData.currency} {parseFloat(formData.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </p>
                   </div>

@@ -611,11 +611,11 @@ const InternationalTransferPage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="international-transfer-page">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
             <Globe className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             International Transfer
           </h1>
@@ -627,13 +627,12 @@ const InternationalTransferPage = () => {
 
       {/* Transfer Type Selection */}
       <Tabs value={activeType} onValueChange={setActiveType} className="space-y-6">
-        <TabsList className="bg-swiss-bg-paper border border-white/10 p-1 rounded-sm h-auto flex-wrap">
+        <TabsList className="bg-swiss-bg-paper border border-slate-200 p-1 rounded-sm h-auto flex-wrap">
           {transferTypes.map((type) => (
             <TabsTrigger
               key={type.id}
               value={type.id}
               className="data-[state=active]:bg-swiss-red data-[state=active]:text-white text-swiss-text-secondary rounded-sm px-4 py-2"
-              data-testid={`transfer-type-${type.id}`}
             >
               <span className="font-mono text-xs">{type.id}</span>
             </TabsTrigger>
@@ -644,9 +643,9 @@ const InternationalTransferPage = () => {
           <TabsContent key={type.id} value={type.id} className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Transfer Form */}
-              <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+              <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
                 <CardHeader>
-                  <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+                  <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
                     <FileText className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
                     {type.name}
                   </CardTitle>
@@ -657,13 +656,13 @@ const InternationalTransferPage = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider">Amount</Label>
-                        <Input type="number" step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} className="bg-swiss-bg-subtle border-white/10 text-white font-mono rounded-sm h-11" placeholder="0.00" data-testid="transfer-amount" required />
+                        <Input type="number" step="0.01" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} className="bg-swiss-bg-subtle border-slate-200 text-slate-900 font-mono rounded-sm h-11" placeholder="0.00" required />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider">Currency</Label>
                         <Select value={formData.currency} onValueChange={(value) => setFormData({ ...formData, currency: value })}>
-                          <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="transfer-currency"><SelectValue /></SelectTrigger>
-                          <SelectContent className="bg-swiss-bg-paper border-white/10">
+                          <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11"><SelectValue /></SelectTrigger>
+                          <SelectContent className="bg-swiss-bg-paper border-slate-200">
                             <SelectItem value="EUR">EUR - Euro</SelectItem>
                             <SelectItem value="USD">USD - US Dollar</SelectItem>
                             <SelectItem value="CHF">CHF - Swiss Franc</SelectItem>
@@ -675,8 +674,8 @@ const InternationalTransferPage = () => {
                     <div className="space-y-2">
                       <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider">Sender Account (IBAN)</Label>
                       <Select value={formData.sender_account} onValueChange={(value) => setFormData({ ...formData, sender_account: value })}>
-                        <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="transfer-sender"><SelectValue placeholder="Select account" /></SelectTrigger>
-                        <SelectContent className="bg-swiss-bg-paper border-white/10">
+                        <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11"><SelectValue placeholder="Select account" /></SelectTrigger>
+                        <SelectContent className="bg-swiss-bg-paper border-slate-200">
                           {balances.map((bal) => (<SelectItem key={bal.iban} value={bal.iban}><span className="font-mono text-sm">{bal.iban}</span><span className="text-swiss-text-muted ml-2">({bal.currency})</span></SelectItem>))}
                         </SelectContent>
                       </Select>
@@ -685,8 +684,8 @@ const InternationalTransferPage = () => {
                     <div className="space-y-2">
                       <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider">Beneficiary</Label>
                       <Select value={formData.beneficiary_id} onValueChange={(value) => setFormData({ ...formData, beneficiary_id: value })}>
-                        <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="transfer-beneficiary"><SelectValue placeholder="Select beneficiary" /></SelectTrigger>
-                        <SelectContent className="bg-swiss-bg-paper border-white/10">
+                        <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11"><SelectValue placeholder="Select beneficiary" /></SelectTrigger>
+                        <SelectContent className="bg-swiss-bg-paper border-slate-200">
                           {beneficiaries.length === 0 ? (<div className="p-2 text-sm text-swiss-text-muted">No beneficiaries. Add one first.</div>) : (beneficiaries.map((ben) => (<SelectItem key={ben.id} value={ben.id}><span>{ben.name}</span><span className="text-swiss-text-muted ml-2">- {ben.bank_name}</span></SelectItem>)))}
                         </SelectContent>
                       </Select>
@@ -695,22 +694,22 @@ const InternationalTransferPage = () => {
                     <div className="space-y-2">
                       <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider">Charge Option</Label>
                       <Select value={formData.charge_option} onValueChange={(value) => setFormData({ ...formData, charge_option: value })}>
-                        <SelectTrigger className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" data-testid="transfer-charge"><SelectValue /></SelectTrigger>
-                        <SelectContent className="bg-swiss-bg-paper border-white/10">{chargeOptions.map((opt) => (<SelectItem key={opt.value} value={opt.value}><span>{opt.label}</span></SelectItem>))}</SelectContent>
+                        <SelectTrigger className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11"><SelectValue /></SelectTrigger>
+                        <SelectContent className="bg-swiss-bg-paper border-slate-200">{chargeOptions.map((opt) => (<SelectItem key={opt.value} value={opt.value}><span>{opt.label}</span></SelectItem>))}</SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-2">
                       <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider">Payment Reference</Label>
-                      <Input value={formData.reference} onChange={(e) => setFormData({ ...formData, reference: e.target.value })} className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" placeholder="Invoice #12345" data-testid="transfer-reference" required />
+                      <Input value={formData.reference} onChange={(e) => setFormData({ ...formData, reference: e.target.value })} className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11" placeholder="Invoice #12345" required />
                     </div>
 
                     <div className="space-y-2">
                       <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider">Purpose (Optional)</Label>
-                      <Input value={formData.purpose} onChange={(e) => setFormData({ ...formData, purpose: e.target.value })} className="bg-swiss-bg-subtle border-white/10 text-white rounded-sm h-11" placeholder="Payment for services" data-testid="transfer-purpose" />
+                      <Input value={formData.purpose} onChange={(e) => setFormData({ ...formData, purpose: e.target.value })} className="bg-swiss-bg-subtle border-slate-200 text-slate-900 rounded-sm h-11" placeholder="Payment for services" />
                     </div>
 
-                    <Button type="submit" disabled={loading || beneficiaries.length === 0} className="w-full h-12 bg-swiss-red hover:bg-swiss-red-hover text-white font-medium uppercase tracking-wider rounded-sm" data-testid="submit-transfer">
+                    <Button type="submit" disabled={loading || beneficiaries.length === 0} className="w-full h-12 bg-swiss-red hover:bg-swiss-red-hover text-white font-medium uppercase tracking-wider rounded-sm">
                       {loading ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Processing...</>) : (<><Send className="w-4 h-4 mr-2" />Initiate {type.id} Transfer</>)}
                     </Button>
                   </form>
@@ -719,14 +718,14 @@ const InternationalTransferPage = () => {
 
               {/* SWIFT Message Preview & Receipt Buttons */}
               <div className="space-y-4">
-                <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+                <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
                   <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+                    <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
                       <FileCode2 className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
                       SWIFT Message Preview
                     </CardTitle>
                     {swiftMessage && (
-                      <Button variant="ghost" size="sm" onClick={copyToClipboard} className="text-swiss-text-secondary hover:text-white" data-testid="copy-swift-message">
+                      <Button variant="ghost" size="sm" onClick={copyToClipboard} className="text-swiss-text-secondary hover:text-slate-900">
                         {copied ? <CheckCircle2 className="w-4 h-4 text-swiss-status-success" /> : <Copy className="w-4 h-4" />}
                       </Button>
                     )}
@@ -747,21 +746,21 @@ const InternationalTransferPage = () => {
 
                 {/* Receipt Buttons */}
                 {transferResult && (
-                  <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+                  <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
                     <CardHeader>
-                      <CardTitle className="font-heading text-lg text-white">Download Receipts</CardTitle>
+                      <CardTitle className="font-heading text-lg text-slate-900">Download Receipts</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-2 gap-3">
-                      <Button variant="outline" onClick={() => openReceipt('debit-note')} className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm h-auto py-3" data-testid="btn-debit-note">
+                      <Button variant="outline" onClick={() => openReceipt('debit-note')} className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm h-auto py-3">
                         <div className="text-left"><Eye className="w-4 h-4 mb-1" /><div className="text-xs font-bold">Debit Note</div><div className="text-[10px] opacity-70">Official Debit</div></div>
                       </Button>
-                      <Button variant="outline" onClick={() => openReceipt('pacs002')} className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm h-auto py-3" data-testid="btn-pacs002">
+                      <Button variant="outline" onClick={() => openReceipt('pacs002')} className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm h-auto py-3">
                         <div className="text-left"><Eye className="w-4 h-4 mb-1" /><div className="text-xs font-bold">PACS.002</div><div className="text-[10px] opacity-70">Status Report</div></div>
                       </Button>
-                      <Button variant="outline" onClick={() => openReceipt('mt950')} className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm h-auto py-3" data-testid="btn-mt950">
+                      <Button variant="outline" onClick={() => openReceipt('mt950')} className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm h-auto py-3">
                         <div className="text-left"><Eye className="w-4 h-4 mb-1" /><div className="text-xs font-bold">MT950</div><div className="text-[10px] opacity-70">Statement</div></div>
                       </Button>
-                      <Button variant="outline" onClick={() => openReceipt('tax-compliance')} className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm h-auto py-3" data-testid="btn-tax">
+                      <Button variant="outline" onClick={() => openReceipt('tax-compliance')} className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm h-auto py-3">
                         <div className="text-left"><Eye className="w-4 h-4 mb-1" /><div className="text-xs font-bold">Tax Report</div><div className="text-[10px] opacity-70">CRS/FATCA</div></div>
                       </Button>
                     </CardContent>
@@ -776,11 +775,11 @@ const InternationalTransferPage = () => {
       {/* Transfer Types Info */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {transferTypes.map((type) => (
-          <Card key={type.id} className={`bg-swiss-bg-paper border-white/10 rounded-sm cursor-pointer transition-all ${activeType === type.id ? 'border-swiss-red' : 'hover:border-white/20'}`} onClick={() => setActiveType(type.id)}>
+          <Card key={type.id} className={`bg-swiss-bg-paper border-slate-200 rounded-sm cursor-pointer transition-all ${activeType === type.id ? 'border-swiss-red' : 'hover:border-slate-300'}`} onClick={() => setActiveType(type.id)}>
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 {type.id === 'GPI' ? <Zap className="w-4 h-4 text-swiss-red" strokeWidth={1.5} /> : <FileText className="w-4 h-4 text-swiss-text-muted" strokeWidth={1.5} />}
-                <Badge variant="outline" className={`text-xs rounded-sm ${activeType === type.id ? 'border-swiss-red text-swiss-red' : 'border-white/20 text-swiss-text-secondary'}`}>{type.id}</Badge>
+                <Badge variant="outline" className={`text-xs rounded-sm ${activeType === type.id ? 'border-swiss-red text-swiss-red' : 'border-slate-300 text-swiss-text-secondary'}`}>{type.id}</Badge>
               </div>
               <p className="text-xs text-swiss-text-muted">{type.description}</p>
             </CardContent>
@@ -790,15 +789,15 @@ const InternationalTransferPage = () => {
 
       {/* Receipt Modal */}
       <Dialog open={receiptOpen} onOpenChange={setReceiptOpen}>
-        <DialogContent className="bg-swiss-bg-paper border-white/10 max-w-4xl max-h-[90vh]">
+        <DialogContent className="bg-swiss-bg-paper border-slate-200 max-w-4xl max-h-[90vh]">
           <DialogHeader className="flex flex-row items-center justify-between">
-            <DialogTitle className="font-heading text-xl text-white">
+            <DialogTitle className="font-heading text-xl text-slate-900">
               {receiptType === 'debit-note' && 'Official Debit Note'}
               {receiptType === 'pacs002' && 'ISO 20022 PACS.002 Payment Status Report'}
               {receiptType === 'mt950' && 'Official MT950 Statement Message'}
               {receiptType === 'tax-compliance' && 'Tax Reporting Document - CRS/FATCA/AEOI'}
             </DialogTitle>
-            <Button onClick={printReceipt} className="bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm" data-testid="print-receipt">
+            <Button onClick={printReceipt} className="bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm">
               <Printer className="w-4 h-4 mr-2" />Print PDF
             </Button>
           </DialogHeader>

@@ -150,11 +150,11 @@ const StatementPage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="statement-page">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
             <FileSpreadsheet className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             Account Statement
           </h1>
@@ -166,8 +166,7 @@ const StatementPage = () => {
           <Button
             onClick={() => fetchStatement(activeCurrency)}
             variant="outline"
-            className="border-white/10 text-swiss-text-secondary hover:text-white rounded-sm"
-            data-testid="refresh-statement"
+            className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 rounded-sm"
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -176,7 +175,6 @@ const StatementPage = () => {
             onClick={printStatement}
             disabled={!statement}
             className="bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm"
-            data-testid="print-statement"
           >
             <Printer className="w-4 h-4 mr-2" />
             Print Statement
@@ -193,9 +191,8 @@ const StatementPage = () => {
             className={`bg-swiss-bg-paper border rounded-sm cursor-pointer transition-all ${
               activeCurrency === s.currency
                 ? 'border-swiss-red ring-1 ring-swiss-red/30'
-                : 'border-white/10 hover:border-white/20'
+                : 'border-slate-200 hover:border-slate-300'
             }`}
-            data-testid={`statement-account-${s.currency}`}
           >
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
@@ -210,7 +207,7 @@ const StatementPage = () => {
                 </Badge>
                 <span className="text-xs text-swiss-text-muted">{s.transaction_count} entries</span>
               </div>
-              <p className="font-mono text-xl text-white">
+              <p className="font-mono text-xl text-slate-900">
                 {formatCurrency(s.balance, s.currency)}
               </p>
               <p className="font-mono text-xs text-swiss-text-muted mt-1">{s.iban}</p>
@@ -221,7 +218,7 @@ const StatementPage = () => {
 
       {/* Statement Content */}
       {loading ? (
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="flex items-center justify-center py-20">
             <RefreshCw className="w-6 h-6 animate-spin text-swiss-text-muted" />
           </CardContent>
@@ -230,26 +227,26 @@ const StatementPage = () => {
         <>
           {/* Balance Summary Strip */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+            <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
               <CardContent className="p-4">
                 <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Opening Balance</p>
-                <p className="font-mono text-lg text-white" data-testid="opening-balance">
+                <p className="font-mono text-lg text-slate-900">
                   {formatCurrency(statement.opening_balance, statement.currency)}
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+            <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
               <CardContent className="p-4">
                 <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Total Debits</p>
-                <p className="font-mono text-lg text-red-400" data-testid="total-debits">
+                <p className="font-mono text-lg text-red-400">
                   {formatCurrency(statement.total_debits, statement.currency)}
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+            <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
               <CardContent className="p-4">
                 <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Total Credits</p>
-                <p className="font-mono text-lg text-emerald-400" data-testid="total-credits">
+                <p className="font-mono text-lg text-emerald-400">
                   {formatCurrency(statement.total_credits, statement.currency)}
                 </p>
               </CardContent>
@@ -257,7 +254,7 @@ const StatementPage = () => {
             <Card className="bg-swiss-bg-paper border-swiss-red/30 rounded-sm ring-1 ring-swiss-red/20">
               <CardContent className="p-4">
                 <p className="text-xs text-swiss-red uppercase tracking-wider mb-1">Closing Balance</p>
-                <p className="font-mono text-lg text-white font-bold" data-testid="closing-balance">
+                <p className="font-mono text-lg text-slate-900 font-bold">
                   {formatCurrency(statement.closing_balance, statement.currency)}
                 </p>
               </CardContent>
@@ -265,9 +262,9 @@ const StatementPage = () => {
           </div>
 
           {/* Statement Table */}
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+              <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
                 {statement.currency} Account Statement
               </CardTitle>
@@ -282,9 +279,9 @@ const StatementPage = () => {
             </CardHeader>
             <CardContent className="p-0">
               <ScrollArea className="h-[500px]">
-                <table className="w-full" data-testid="statement-table">
+                <table className="w-full">
                   <thead className="sticky top-0 z-10">
-                    <tr className="bg-swiss-bg-paper border-b border-white/10">
+                    <tr className="bg-swiss-bg-paper border-b border-slate-200">
                       <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Date</th>
                       <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Description</th>
                       <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Reference</th>
@@ -295,10 +292,10 @@ const StatementPage = () => {
                   </thead>
                   <tbody>
                     {/* Opening balance row */}
-                    <tr className="bg-amber-500/5 border-b border-white/5">
+                    <tr className="bg-amber-500/5 border-b border-slate-100">
                       <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">{formatDate(statement.period_start)}</td>
-                      <td colSpan="4" className="py-3 px-4 text-amber-300 text-xs font-medium uppercase tracking-wider">Opening Balance</td>
-                      <td className="py-3 px-4 text-right font-mono text-xs text-white font-bold">
+                      <td colSpan="4" className="py-3 px-4 text-amber-700 text-xs font-medium uppercase tracking-wider">Opening Balance</td>
+                      <td className="py-3 px-4 text-right font-mono text-xs text-slate-900 font-bold">
                         {formatCurrency(statement.opening_balance, statement.currency)}
                       </td>
                     </tr>
@@ -311,11 +308,11 @@ const StatementPage = () => {
                       </tr>
                     ) : (
                       statement.lines.map((ln, i) => (
-                        <tr key={ln.id || i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                        <tr key={ln.id || i} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                           <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">
                             {formatDate(ln.date)}
                           </td>
-                          <td className="py-3 px-4 text-white text-xs max-w-[250px] truncate">
+                          <td className="py-3 px-4 text-slate-900 text-xs max-w-[250px] truncate">
                             {ln.description}
                           </td>
                           <td className="py-3 px-4 font-mono text-xs text-swiss-text-muted">
@@ -331,7 +328,7 @@ const StatementPage = () => {
                               <span className="text-emerald-400">{formatCurrency(ln.credit, statement.currency)}</span>
                             )}
                           </td>
-                          <td className="py-3 px-4 text-right font-mono text-xs text-white font-medium">
+                          <td className="py-3 px-4 text-right font-mono text-xs text-slate-900 font-medium">
                             {formatCurrency(ln.balance, statement.currency)}
                           </td>
                         </tr>
@@ -342,7 +339,7 @@ const StatementPage = () => {
                     <tr className="bg-swiss-red/5 border-t-2 border-swiss-red/30">
                       <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">{formatDate(statement.period_end)}</td>
                       <td colSpan="4" className="py-3 px-4 text-swiss-red text-xs font-bold uppercase tracking-wider">Closing Balance</td>
-                      <td className="py-3 px-4 text-right font-mono text-sm text-white font-bold">
+                      <td className="py-3 px-4 text-right font-mono text-sm text-slate-900 font-bold">
                         {formatCurrency(statement.closing_balance, statement.currency)}
                       </td>
                     </tr>
@@ -353,7 +350,7 @@ const StatementPage = () => {
           </Card>
 
           {/* Statement Footer Info */}
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between text-xs text-swiss-text-muted">
                 <div className="flex items-center gap-4">

@@ -15,8 +15,8 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #020617;
-  color: #ffffff;
+  background-color: #FFFFFF;
+  color: #0F172A;
 }
 
 code {
@@ -30,38 +30,38 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0F172A;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94A3B8;
 }
 
 @layer base {
   :root {
-    --background: 222 84% 5%;
-    --foreground: 0 0% 100%;
-    --card: 217 33% 6%;
-    --card-foreground: 0 0% 100%;
-    --popover: 217 33% 6%;
-    --popover-foreground: 0 0% 100%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 210 40% 98%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
     --primary: 0 84% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
     --accent: 0 84% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 222 47% 11%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 100% / 0.1;
-    --input: 0 0% 100% / 0.1;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 0 84% 50%;
     --radius: 0.25rem;
     --chart-1: 0 84% 50%;
@@ -74,10 +74,10 @@ code {
 
 @layer base {
   * {
-    @apply border-white/10;
+    @apply border-slate-200;
   }
   body {
-    @apply bg-[#020617] text-white;
+    @apply bg-white text-slate-900;
   }
 }
 
@@ -103,7 +103,7 @@ code {
 
 /* Glow effects */
 .glow-red {
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.15);
 }
 
 /* Animation keyframes */
@@ -117,8 +117,8 @@ code {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.8); }
+  0%, 100% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
 }
 
 .pulse-glow {
@@ -132,7 +132,7 @@ code {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  color: #94A3B8;
+  color: #64748B;
 }
 
 /* Swiss card hover */
@@ -141,7 +141,7 @@ code {
 }
 
 .swiss-card:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 /* Status indicators */

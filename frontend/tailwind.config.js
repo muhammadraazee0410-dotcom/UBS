@@ -17,19 +17,19 @@ module.exports = {
         foreground: 'hsl(var(--foreground))',
         swiss: {
           bg: {
-            DEFAULT: '#020617',
-            paper: '#0F172A',
-            subtle: '#1E293B',
+            DEFAULT: '#FFFFFF',
+            paper: '#F8FAFC',
+            subtle: '#F1F5F9',
           },
           text: {
-            primary: '#FFFFFF',
-            secondary: '#94A3B8',
-            muted: '#64748B',
+            primary: '#0F172A',
+            secondary: '#475569',
+            muted: '#94A3B8',
           },
           red: {
             DEFAULT: '#DC2626',
             hover: '#B91C1C',
-            glow: 'rgba(220, 38, 38, 0.3)',
+            glow: 'rgba(220, 38, 38, 0.15)',
           },
           status: {
             success: '#10B981',

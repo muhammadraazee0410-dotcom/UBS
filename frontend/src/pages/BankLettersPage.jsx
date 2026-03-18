@@ -59,30 +59,30 @@ const BankLettersPage = () => {
     setTimeout(() => { w.print(); w.close(); }, 250);
   };
 
-  if (loading) return <div className="flex items-center justify-center h-64" data-testid="bank-letters-page"><RefreshCw className="w-6 h-6 animate-spin text-swiss-text-muted" /></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><RefreshCw className="w-6 h-6 animate-spin text-swiss-text-muted" /></div>;
   if (!data) return null;
 
   const { profile: p, officer: o, balances, references: refs, signatories: sigs } = data;
 
   return (
-    <div className="space-y-6" data-testid="bank-letters-page">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
             <Mail className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             Bank Letters
           </h1>
           <p className="text-swiss-text-secondary mt-1">Official UBS confirmation letters and references</p>
         </div>
-        <Button onClick={printLetter} className="bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm" data-testid="print-letter">
+        <Button onClick={printLetter} className="bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm">
           <Printer className="w-4 h-4 mr-2" />Print Letter
         </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-swiss-bg-paper border border-white/10 p-1 rounded-sm h-auto flex-wrap gap-1">
+        <TabsList className="bg-swiss-bg-paper border border-slate-200 p-1 rounded-sm h-auto flex-wrap gap-1">
           {letterTabs.map(t => (
-            <TabsTrigger key={t.id} value={t.id} className="data-[state=active]:bg-swiss-red data-[state=active]:text-white text-swiss-text-secondary rounded-sm px-4 py-2 text-xs" data-testid={`letter-tab-${t.id}`}>
+            <TabsTrigger key={t.id} value={t.id} className="data-[state=active]:bg-swiss-red data-[state=active]:text-white text-swiss-text-secondary rounded-sm px-4 py-2 text-xs">
               <t.icon className="w-3.5 h-3.5 mr-1.5" />{t.label}
             </TabsTrigger>
           ))}
@@ -90,34 +90,34 @@ const BankLettersPage = () => {
 
         {/* ===== AUTHORISED BALANCE CONFIRMATION ===== */}
         <TabsContent value="auth-balance">
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-0">
               <ScrollArea className="h-[650px]">
                 <div className="p-8 space-y-6">
                   <LetterHead date={data.date} refNum={refs.auth_balance_ref} />
                   <div className="text-center">
-                    <h2 className="font-heading font-bold text-lg text-white uppercase tracking-wider">Authorised Bank Balance Confirmation</h2>
+                    <h2 className="font-heading font-bold text-lg text-slate-900 uppercase tracking-wider">Authorised Bank Balance Confirmation</h2>
                     <p className="text-swiss-text-muted text-xs mt-1">STRICTLY CONFIDENTIAL — AUTHORISED SIGNATORIES</p>
                   </div>
                   <LetterTo />
                   <div className="space-y-4 text-sm text-swiss-text-secondary leading-relaxed">
-                    <p>We, <span className="text-white font-bold">Union Bank of Switzerland AG (UBS)</span>, SWIFT: UBSWCHZHXXX, Bahnhofstrasse 45, 8001 Zurich, Switzerland, hereby issue this official bank balance confirmation letter at the request and authorisation of the duly appointed signatories of <span className="text-white font-bold">{p.company_name}</span> (Company ID N° {p.company_id}).</p>
+                    <p>We, <span className="text-slate-900 font-bold">Union Bank of Switzerland AG (UBS)</span>, SWIFT: UBSWCHZHXXX, Bahnhofstrasse 45, 8001 Zurich, Switzerland, hereby issue this official bank balance confirmation letter at the request and authorisation of the duly appointed signatories of <span className="text-slate-900 font-bold">{p.company_name}</span> (Company ID N° {p.company_id}).</p>
 
                     {/* Authorised Signatories Section */}
-                    <div className="bg-swiss-bg-subtle border border-white/10 p-5 rounded-sm">
+                    <div className="bg-swiss-bg-subtle border border-slate-200 p-5 rounded-sm">
                       <p className="text-[10px] text-swiss-red uppercase tracking-widest mb-4 font-bold">Authorised Signatories</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {sigs && sigs.map((s, i) => (
-                          <div key={i} className="bg-swiss-bg-paper border border-white/5 p-4 rounded-sm">
+                          <div key={i} className="bg-swiss-bg-paper border border-slate-100 p-4 rounded-sm">
                             <div className="flex items-center justify-between mb-3">
-                              <p className="text-white font-bold text-sm">{s.name}</p>
+                              <p className="text-slate-900 font-bold text-sm">{s.name}</p>
                               <Badge className="bg-swiss-red/10 text-swiss-red border border-swiss-red/30 rounded-sm text-[10px]">
                                 <Shield className="w-3 h-3 mr-1" />Authorised
                               </Badge>
                             </div>
                             <div className="space-y-1.5">
                               <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Title:</span><span className="text-swiss-text-secondary text-xs">{s.title}</span></div>
-                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Passport N°:</span><span className="text-white text-xs font-mono">{s.passport_number}</span></div>
+                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Passport N°:</span><span className="text-slate-900 text-xs font-mono">{s.passport_number}</span></div>
                               <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Country:</span><span className="text-swiss-text-secondary text-xs">{s.country_of_issue}</span></div>
                               <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Issued:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_issue}</span></div>
                               <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Expires:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_expiry}</span></div>
@@ -130,13 +130,13 @@ const BankLettersPage = () => {
                     <p>Acting in their capacity as duly authorised POA Holders and Signatories, the above-named individuals have authorised the bank to confirm the following account balances held with Union Bank of Switzerland AG:</p>
 
                     {/* Balance Confirmation Table */}
-                    <div className="border border-white/10 rounded-sm overflow-hidden">
+                    <div className="border border-slate-200 rounded-sm overflow-hidden">
                       <div className="bg-swiss-red/10 px-4 py-2">
                         <p className="text-swiss-red text-[10px] uppercase tracking-widest font-bold">Confirmed Account Balances</p>
                       </div>
-                      <table className="w-full" data-testid="auth-balance-table">
+                      <table className="w-full">
                         <thead>
-                          <tr className="bg-swiss-bg-subtle border-b border-white/10">
+                          <tr className="bg-swiss-bg-subtle border-b border-slate-200">
                             <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Currency</th>
                             <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Account Number</th>
                             <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">IBAN</th>
@@ -145,11 +145,11 @@ const BankLettersPage = () => {
                         </thead>
                         <tbody>
                           {balances.map((b, i) => (
-                            <tr key={b.currency} className="border-b border-white/5">
+                            <tr key={b.currency} className="border-b border-slate-100">
                               <td className="py-3 px-4"><Badge className="bg-swiss-red/10 text-swiss-red rounded-sm text-xs">{b.currency}</Badge></td>
                               <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">{b.account_number}</td>
                               <td className="py-3 px-4 font-mono text-xs text-swiss-text-muted">{b.iban}</td>
-                              <td className="py-3 px-4 text-right font-mono text-sm text-white font-bold">{formatCurrency(b.balance, b.currency)}</td>
+                              <td className="py-3 px-4 text-right font-mono text-sm text-slate-900 font-bold">{formatCurrency(b.balance, b.currency)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -165,19 +165,19 @@ const BankLettersPage = () => {
                     </div>
 
                     <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded-sm mt-4">
-                      <p className="text-amber-300 text-xs font-bold uppercase tracking-wider mb-2">Declaration</p>
+                      <p className="text-amber-700 text-xs font-bold uppercase tracking-wider mb-2">Declaration</p>
                       <p className="text-swiss-text-secondary text-xs italic">This balance confirmation is issued at the express request and authorisation of the account signatories named herein. It is valid as of the date of issuance and is intended solely for the use of the addressee. Union Bank of Switzerland AG shall bear no liability for any reliance placed upon this confirmation by third parties.</p>
                     </div>
                   </div>
 
                   {/* Dual Signatory Block */}
-                  <div className="border-t border-white/10 pt-6 mt-6">
+                  <div className="border-t border-slate-200 pt-6 mt-6">
                     <p className="text-xs text-swiss-text-muted mb-6">Authorised and confirmed by:</p>
                     <div className="grid grid-cols-2 gap-8">
                       {sigs && sigs.map((s, i) => (
                         <div key={i} className="text-center">
-                          <div className="h-14 border-b-2 border-white/20 mb-3" />
-                          <p className="text-white font-bold text-sm">{s.name}</p>
+                          <div className="h-14 border-b-2 border-slate-300 mb-3" />
+                          <p className="text-slate-900 font-bold text-sm">{s.name}</p>
                           <p className="text-swiss-text-muted text-xs">{s.title}</p>
                           <p className="text-swiss-text-muted text-xs font-mono mt-1">Passport: {s.passport_number}</p>
                         </div>
@@ -186,10 +186,10 @@ const BankLettersPage = () => {
                   </div>
 
                   {/* Bank Officer Countersign */}
-                  <div className="border-t border-white/10 pt-6">
+                  <div className="border-t border-slate-200 pt-6">
                     <p className="text-xs text-swiss-text-muted mb-1">Countersigned and verified by the Bank:</p>
-                    <div className="mt-8 border-t-2 border-white/20 pt-3 max-w-xs">
-                      <p className="text-white font-bold text-sm">{o.name}</p>
+                    <div className="mt-8 border-t-2 border-slate-300 pt-3 max-w-xs">
+                      <p className="text-slate-900 font-bold text-sm">{o.name}</p>
                       <p className="text-swiss-text-muted text-xs">{o.title}</p>
                       <p className="text-swiss-text-muted text-xs">{o.department}</p>
                       <p className="text-swiss-text-muted text-xs font-mono mt-1">Officer ID: {o.officer_id}</p>
@@ -205,33 +205,33 @@ const BankLettersPage = () => {
 
         {/* ===== RELATIONSHIP LETTER ===== */}
         <TabsContent value="relationship">
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-0">
               <ScrollArea className="h-[650px]">
                 <div className="p-8 space-y-6">
                   <LetterHead date={data.date} refNum={refs.relationship_ref} />
                   <div className="text-center">
-                    <h2 className="font-heading font-bold text-lg text-white uppercase tracking-wider">Confirmation of Account Relationship</h2>
+                    <h2 className="font-heading font-bold text-lg text-slate-900 uppercase tracking-wider">Confirmation of Account Relationship</h2>
                     <p className="text-swiss-text-muted text-xs mt-1">CONFIDENTIAL — FOR ADDRESSEE ONLY</p>
                   </div>
                   <LetterTo />
                   <div className="space-y-4 text-sm text-swiss-text-secondary leading-relaxed">
-                    <p>We, Union Bank of Switzerland AG (UBS), SWIFT: UBSWCHZHXXX, hereby confirm that <span className="text-white font-bold">{p.company_name}</span> (Company ID: {p.company_id}), with registered address at {p.address}, has maintained a banking relationship with our institution since <span className="text-white font-bold">{data.relationship_since}</span>.</p>
-                    <p>The account was opened on <span className="text-white font-bold">{data.account_opened}</span> and remains active and in good standing as of the date of this letter. The account name as held with our bank is:</p>
-                    <div className="bg-swiss-bg-subtle border border-white/10 p-4 rounded-sm text-center">
+                    <p>We, Union Bank of Switzerland AG (UBS), SWIFT: UBSWCHZHXXX, hereby confirm that <span className="text-slate-900 font-bold">{p.company_name}</span> (Company ID: {p.company_id}), with registered address at {p.address}, has maintained a banking relationship with our institution since <span className="text-slate-900 font-bold">{data.relationship_since}</span>.</p>
+                    <p>The account was opened on <span className="text-slate-900 font-bold">{data.account_opened}</span> and remains active and in good standing as of the date of this letter. The account name as held with our bank is:</p>
+                    <div className="bg-swiss-bg-subtle border border-slate-200 p-4 rounded-sm text-center">
                       <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Account Name as Held with UBS</p>
-                      <p className="font-mono text-lg text-white font-bold" data-testid="account-name-confirmation">{p.company_name}</p>
+                      <p className="font-mono text-lg text-slate-900 font-bold">{p.company_name}</p>
                     </div>
                     <p>During the tenure of this relationship, the account has been conducted satisfactorily with no irregularities. All transactions have been in compliance with applicable Swiss and international banking regulations, including Anti-Money Laundering (AML) and Know Your Customer (KYC) requirements.</p>
                     <p>The following accounts are maintained under this relationship:</p>
                     <div className="space-y-2">
                       {balances.map(b => (
-                        <div key={b.currency} className="flex items-center justify-between bg-swiss-bg-subtle p-3 rounded-sm border border-white/5">
+                        <div key={b.currency} className="flex items-center justify-between bg-swiss-bg-subtle p-3 rounded-sm border border-slate-100">
                           <div>
                             <Badge className="bg-swiss-red/10 text-swiss-red rounded-sm text-xs mr-2">{b.currency}</Badge>
                             <span className="font-mono text-xs text-swiss-text-muted">{b.iban}</span>
                           </div>
-                          <span className="font-mono text-sm text-white font-bold">{formatCurrency(b.balance, b.currency)}</span>
+                          <span className="font-mono text-sm text-slate-900 font-bold">{formatCurrency(b.balance, b.currency)}</span>
                         </div>
                       ))}
                     </div>
@@ -247,18 +247,18 @@ const BankLettersPage = () => {
 
         {/* ===== BANK OFFICER LETTER ===== */}
         <TabsContent value="officer">
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-0">
               <ScrollArea className="h-[650px]">
                 <div className="p-8 space-y-6">
                   <LetterHead date={data.date} refNum={refs.confirmation_ref} />
                   <div className="text-center">
-                    <h2 className="font-heading font-bold text-lg text-white uppercase tracking-wider">Confirmation of Handling Bank Officer</h2>
+                    <h2 className="font-heading font-bold text-lg text-slate-900 uppercase tracking-wider">Confirmation of Handling Bank Officer</h2>
                   </div>
                   <LetterTo />
                   <div className="space-y-4 text-sm text-swiss-text-secondary leading-relaxed">
-                    <p>We hereby confirm that the account of <span className="text-white font-bold">{p.company_name}</span> (Company ID: {p.company_id}) is managed under the supervision of the following designated bank officer:</p>
-                    <div className="bg-swiss-bg-subtle border border-white/10 p-6 rounded-sm space-y-3">
+                    <p>We hereby confirm that the account of <span className="text-slate-900 font-bold">{p.company_name}</span> (Company ID: {p.company_id}) is managed under the supervision of the following designated bank officer:</p>
+                    <div className="bg-swiss-bg-subtle border border-slate-200 p-6 rounded-sm space-y-3">
                       <InfoLine label="Officer Name" value={o.name} />
                       <InfoLine label="Title / Position" value={o.title} />
                       <InfoLine label="Department" value={o.department} />
@@ -280,18 +280,18 @@ const BankLettersPage = () => {
 
         {/* ===== BANK REFERENCE LETTER ===== */}
         <TabsContent value="reference">
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-0">
               <ScrollArea className="h-[650px]">
                 <div className="p-8 space-y-6">
                   <LetterHead date={data.date} refNum={refs.statement_ref} />
                   <div className="text-center">
-                    <h2 className="font-heading font-bold text-lg text-white uppercase tracking-wider">Bank Reference Letter</h2>
+                    <h2 className="font-heading font-bold text-lg text-slate-900 uppercase tracking-wider">Bank Reference Letter</h2>
                   </div>
                   <LetterTo />
                   <div className="space-y-4 text-sm text-swiss-text-secondary leading-relaxed">
                     <p>TO WHOM IT MAY CONCERN,</p>
-                    <p>Union Bank of Switzerland AG (UBS) is pleased to provide this bank reference in respect of our valued client <span className="text-white font-bold">{p.company_name}</span>, Company ID N° {p.company_id}, domiciled at {p.address}.</p>
+                    <p>Union Bank of Switzerland AG (UBS) is pleased to provide this bank reference in respect of our valued client <span className="text-slate-900 font-bold">{p.company_name}</span>, Company ID N° {p.company_id}, domiciled at {p.address}.</p>
                     <p>We confirm the following:</p>
                     <div className="space-y-3">
                       <RefItem num="1" text={`${p.company_name} has maintained accounts with UBS since ${data.relationship_since} and the relationship remains active and in good standing.`} />
@@ -301,17 +301,17 @@ const BankLettersPage = () => {
                     </div>
                     <p className="mt-4">Current account balances as of the date of this letter:</p>
                     <table className="w-full mt-2">
-                      <thead><tr className="border-b border-white/10">
+                      <thead><tr className="border-b border-slate-200">
                         <th className="text-left py-2 text-swiss-text-muted text-[10px] uppercase tracking-wider">Currency</th>
                         <th className="text-left py-2 text-swiss-text-muted text-[10px] uppercase tracking-wider">IBAN</th>
                         <th className="text-right py-2 text-swiss-text-muted text-[10px] uppercase tracking-wider">Balance</th>
                       </tr></thead>
                       <tbody>
                         {balances.map(b => (
-                          <tr key={b.currency} className="border-b border-white/5">
-                            <td className="py-2 text-white text-sm">{b.currency}</td>
+                          <tr key={b.currency} className="border-b border-slate-100">
+                            <td className="py-2 text-slate-900 text-sm">{b.currency}</td>
                             <td className="py-2 font-mono text-xs text-swiss-text-muted">{b.iban}</td>
-                            <td className="py-2 text-right font-mono text-sm text-white font-bold">{formatCurrency(b.balance, b.currency)}</td>
+                            <td className="py-2 text-right font-mono text-sm text-slate-900 font-bold">{formatCurrency(b.balance, b.currency)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -328,18 +328,18 @@ const BankLettersPage = () => {
 
         {/* ===== ASSET CONTROL LETTER ===== */}
         <TabsContent value="asset-control">
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-0">
               <ScrollArea className="h-[650px]">
                 <div className="p-8 space-y-6">
                   <LetterHead date={data.date} refNum={refs.asset_ref} />
                   <div className="text-center">
-                    <h2 className="font-heading font-bold text-lg text-white uppercase tracking-wider">Confirmation of Funds & Asset Control</h2>
+                    <h2 className="font-heading font-bold text-lg text-slate-900 uppercase tracking-wider">Confirmation of Funds & Asset Control</h2>
                     <p className="text-swiss-text-muted text-xs mt-1">STRICTLY PRIVATE & CONFIDENTIAL</p>
                   </div>
                   <LetterTo />
                   <div className="space-y-4 text-sm text-swiss-text-secondary leading-relaxed">
-                    <p>We, Union Bank of Switzerland AG (UBS), SWIFT Code: UBSWCHZHXXX, hereby issue this official confirmation regarding the funds and assets held in the account of <span className="text-white font-bold">{p.company_name}</span> (Company ID: {p.company_id}).</p>
+                    <p>We, Union Bank of Switzerland AG (UBS), SWIFT Code: UBSWCHZHXXX, hereby issue this official confirmation regarding the funds and assets held in the account of <span className="text-slate-900 font-bold">{p.company_name}</span> (Company ID: {p.company_id}).</p>
                     <p>We confirm that:</p>
                     <div className="space-y-3">
                       <ConfirmItem num="1" title="Account Ownership & Control" text={`The funds and assets held in the accounts of ${p.company_name} are under the full and sole control of ${p.authorized_person}, ${p.authorized_title}, Passport N° ${p.passport}. ${p.authorized_person} is duly authorised to operate, manage, and instruct on all accounts held with this institution.`} />
@@ -348,21 +348,21 @@ const BankLettersPage = () => {
                       <ConfirmItem num="4" title="Available for Monetisation" text={`The funds are readily available and permitted for monetisation, transfer, investment, or any lawful transaction as instructed by ${p.authorized_person} or any other duly authorised signatory of ${p.company_name}.`} />
                       <ConfirmItem num="5" title="No Pending Litigation" text="There are no pending or threatened legal proceedings, regulatory actions, or investigations against the account or the account holder that would affect the availability or disposition of the funds." />
                     </div>
-                    <div className="bg-swiss-bg-subtle border border-white/10 p-4 rounded-sm mt-4">
+                    <div className="bg-swiss-bg-subtle border border-slate-200 p-4 rounded-sm mt-4">
                       <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-3">Account Balances Confirmed</p>
                       {balances.map(b => (
-                        <div key={b.currency} className="flex justify-between py-2 border-b border-white/5 last:border-0">
+                        <div key={b.currency} className="flex justify-between py-2 border-b border-slate-100 last:border-0">
                           <div className="flex items-center gap-2">
                             <Badge className="bg-swiss-red/10 text-swiss-red rounded-sm text-xs">{b.currency}</Badge>
                             <span className="font-mono text-xs text-swiss-text-muted">{b.iban}</span>
                           </div>
-                          <span className="font-mono text-sm text-white font-bold">{formatCurrency(b.balance, b.currency)}</span>
+                          <span className="font-mono text-sm text-slate-900 font-bold">{formatCurrency(b.balance, b.currency)}</span>
                         </div>
                       ))}
                     </div>
                     <p className="mt-4">This confirmation is issued at the request of the account holder and is valid as of the date stated herein. Union Bank of Switzerland AG reserves the right to amend or revoke this confirmation should circumstances change materially.</p>
                     <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded-sm mt-4">
-                      <p className="text-amber-300 text-xs font-bold uppercase tracking-wider mb-2">Important Notice</p>
+                      <p className="text-amber-700 text-xs font-bold uppercase tracking-wider mb-2">Important Notice</p>
                       <p className="text-swiss-text-secondary text-xs">This letter is issued without any liability or obligation on the part of Union Bank of Switzerland AG and is subject to the general terms and conditions governing the banking relationship. This confirmation does not constitute a guarantee of payment.</p>
                     </div>
                   </div>
@@ -399,17 +399,17 @@ const LetterHead = ({ date, refNum }) => (
 const LetterTo = () => (
   <div className="bg-swiss-bg-subtle p-4 rounded-sm">
     <p className="text-[10px] text-swiss-text-muted uppercase tracking-wider mb-1">Addressed To</p>
-    <p className="text-white text-sm">To Whom It May Concern</p>
+    <p className="text-slate-900 text-sm">To Whom It May Concern</p>
     <p className="text-swiss-text-muted text-xs">/ All Interested Parties</p>
   </div>
 );
 
 const OfficerSign = ({ officer }) => (
-  <div className="border-t border-white/10 pt-6 mt-6">
+  <div className="border-t border-slate-200 pt-6 mt-6">
     <p className="text-xs text-swiss-text-muted mb-1">Yours faithfully,</p>
     <p className="text-xs text-swiss-text-muted mb-1">For and on behalf of Union Bank of Switzerland AG</p>
-    <div className="mt-8 border-t-2 border-white/20 pt-3 max-w-xs">
-      <p className="text-white font-bold text-sm">{officer.name}</p>
+    <div className="mt-8 border-t-2 border-slate-300 pt-3 max-w-xs">
+      <p className="text-slate-900 font-bold text-sm">{officer.name}</p>
       <p className="text-swiss-text-muted text-xs">{officer.title}</p>
       <p className="text-swiss-text-muted text-xs">{officer.department}</p>
       <p className="text-swiss-text-muted text-xs font-mono mt-1">Officer ID: {officer.officer_id}</p>
@@ -419,7 +419,7 @@ const OfficerSign = ({ officer }) => (
 );
 
 const LetterStamp = ({ refNum }) => (
-  <div className="flex items-center justify-between pt-4 border-t border-white/5">
+  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
     <div className="border-2 border-swiss-red px-4 py-2 text-center rounded-sm">
       <p className="text-[7px] text-swiss-red uppercase tracking-widest">Union Bank of Switzerland AG</p>
       <p className="text-swiss-red font-bold text-lg font-heading">UBS</p>
@@ -435,22 +435,22 @@ const LetterStamp = ({ refNum }) => (
 const InfoLine = ({ label, value }) => (
   <div className="flex">
     <span className="w-44 text-swiss-text-muted text-xs uppercase tracking-wider">{label}:</span>
-    <span className="text-white text-sm font-medium">{value}</span>
+    <span className="text-slate-900 text-sm font-medium">{value}</span>
   </div>
 );
 
 const RefItem = ({ num, text }) => (
-  <div className="flex gap-3 bg-swiss-bg-subtle p-3 rounded-sm border border-white/5">
+  <div className="flex gap-3 bg-swiss-bg-subtle p-3 rounded-sm border border-slate-100">
     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-swiss-red/10 text-swiss-red text-xs flex items-center justify-center font-bold">{num}</span>
     <p className="text-swiss-text-secondary text-sm">{text}</p>
   </div>
 );
 
 const ConfirmItem = ({ num, title, text }) => (
-  <div className="bg-swiss-bg-subtle p-4 rounded-sm border border-white/5">
+  <div className="bg-swiss-bg-subtle p-4 rounded-sm border border-slate-100">
     <div className="flex items-center gap-2 mb-2">
       <span className="w-6 h-6 rounded-full bg-swiss-red/10 text-swiss-red text-xs flex items-center justify-center font-bold flex-shrink-0">{num}</span>
-      <p className="text-white text-sm font-bold uppercase tracking-wider">{title}</p>
+      <p className="text-slate-900 text-sm font-bold uppercase tracking-wider">{title}</p>
     </div>
     <p className="text-swiss-text-secondary text-sm ml-8">{text}</p>
   </div>

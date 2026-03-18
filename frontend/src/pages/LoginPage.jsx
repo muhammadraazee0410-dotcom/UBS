@@ -39,7 +39,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-swiss-bg flex">
+    <div className="min-h-screen bg-white flex">
       {/* Left side - Hero */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         <div 
@@ -53,7 +53,7 @@ const LoginPage = () => {
           <div className="flex items-center gap-3">
             <UBSLogo className="h-12 w-auto text-white" />
             <div>
-              <p className="text-swiss-text-muted text-sm uppercase tracking-widest">
+              <p className="text-white/60 text-sm uppercase tracking-widest">
                 Administration Portal
               </p>
             </div>
@@ -68,20 +68,20 @@ const LoginPage = () => {
             <div className="flex gap-8">
               <div>
                 <p className="font-mono text-3xl text-swiss-red font-bold">150T+</p>
-                <p className="text-swiss-text-muted text-sm">EUR Balance</p>
+                <p className="text-white/60 text-sm">EUR Balance</p>
               </div>
               <div>
                 <p className="font-mono text-3xl text-swiss-red font-bold">15T+</p>
-                <p className="text-swiss-text-muted text-sm">USD Balance</p>
+                <p className="text-white/60 text-sm">USD Balance</p>
               </div>
               <div>
                 <p className="font-mono text-3xl text-swiss-red font-bold">790B+</p>
-                <p className="text-swiss-text-muted text-sm">CHF Balance</p>
+                <p className="text-white/60 text-sm">CHF Balance</p>
               </div>
             </div>
           </div>
 
-          <p className="text-swiss-text-muted text-xs">
+          <p className="text-white/40 text-xs">
             © 2024 Union Bank of Switzerland AG. All rights reserved.
           </p>
         </div>
@@ -92,14 +92,14 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-12">
-            <UBSLogo className="h-10 w-auto text-white" />
+            <UBSLogo className="h-10 w-auto text-swiss-red" />
             <div>
               <p className="text-swiss-text-muted text-xs uppercase tracking-widest">Admin Portal</p>
             </div>
           </div>
 
           <div className="mb-8">
-            <h2 className="font-heading font-black text-3xl text-white mb-2">
+            <h2 className="font-heading font-black text-3xl text-slate-900 mb-2">
               ADMINISTRATOR LOGIN
             </h2>
             <p className="text-swiss-text-secondary">
@@ -119,9 +119,8 @@ const LoginPage = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-11 h-12 bg-swiss-bg-paper border-white/10 text-white placeholder:text-swiss-text-muted focus:border-swiss-red focus:ring-swiss-red/20 rounded-sm"
+                  className="pl-11 h-12 bg-swiss-bg-paper border-slate-200 text-slate-900 placeholder:text-swiss-text-muted focus:border-swiss-red focus:ring-swiss-red/20 rounded-sm"
                   placeholder="admin@ubs.ch"
-                  data-testid="login-email"
                   required
                 />
               </div>
@@ -138,9 +137,8 @@ const LoginPage = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-11 h-12 bg-swiss-bg-paper border-white/10 text-white placeholder:text-swiss-text-muted focus:border-swiss-red focus:ring-swiss-red/20 rounded-sm"
+                  className="pl-11 h-12 bg-swiss-bg-paper border-slate-200 text-slate-900 placeholder:text-swiss-text-muted focus:border-swiss-red focus:ring-swiss-red/20 rounded-sm"
                   placeholder="••••••••"
-                  data-testid="login-password"
                   required
                 />
               </div>
@@ -150,7 +148,6 @@ const LoginPage = () => {
               type="submit"
               disabled={loading}
               className="w-full h-12 bg-swiss-red hover:bg-swiss-red-hover text-white font-body font-medium uppercase tracking-wider rounded-sm transition-all"
-              data-testid="login-submit"
             >
               {loading ? (
                 'Authenticating...'
@@ -163,7 +160,7 @@ const LoginPage = () => {
             </Button>
           </form>
 
-          <div className="mt-8 p-4 bg-swiss-bg-paper border border-white/10 rounded-sm">
+          <div className="mt-8 p-4 bg-swiss-bg-paper border border-slate-200 rounded-sm">
             <p className="text-swiss-text-muted text-xs font-mono">
               Default credentials:<br />
               Email: admin@ubs.ch<br />

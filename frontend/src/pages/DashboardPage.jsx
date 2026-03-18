@@ -77,11 +77,11 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="space-y-6" data-testid="dashboard-page">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight">
             Dashboard
           </h1>
           <p className="text-swiss-text-secondary mt-1">
@@ -91,8 +91,7 @@ const DashboardPage = () => {
         <Button
           onClick={fetchData}
           variant="outline"
-          className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm"
-          data-testid="refresh-dashboard"
+          className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm"
         >
           <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -104,14 +103,13 @@ const DashboardPage = () => {
         {balances.map((balance) => (
           <Card
             key={balance.currency}
-            className="bg-swiss-bg-paper border-white/10 rounded-sm swiss-card overflow-hidden"
-            data-testid={`balance-card-${balance.currency}`}
+            className="bg-swiss-bg-paper border-slate-200 rounded-sm swiss-card overflow-hidden"
           >
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{currencyFlags[balance.currency]}</span>
-                  <span className="font-heading font-bold text-lg text-white">
+                  <span className="font-heading font-bold text-lg text-slate-900">
                     {balance.currency}
                   </span>
                 </div>
@@ -122,7 +120,7 @@ const DashboardPage = () => {
               </div>
               
               <div className="space-y-1">
-                <p className="font-mono text-3xl lg:text-4xl font-bold text-white tracking-tight">
+                <p className="font-mono text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">
                   {formatLargeNumber(balance.balance)}
                 </p>
                 <p className="font-mono text-sm text-swiss-text-muted">
@@ -130,7 +128,7 @@ const DashboardPage = () => {
                 </p>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-white/5 space-y-1">
+              <div className="mt-4 pt-4 border-t border-slate-100 space-y-1">
                 <p className="text-xs text-swiss-text-muted uppercase tracking-wider">Account</p>
                 <p className="font-mono text-sm text-swiss-text-secondary">{balance.account_number}</p>
                 <p className="font-mono text-xs text-swiss-text-muted">{balance.iban}</p>
@@ -144,13 +142,13 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Stats Cards */}
         <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <Activity className="w-5 h-5 text-swiss-text-muted" strokeWidth={1.5} />
                 <TrendingUp className="w-4 h-4 text-swiss-status-success" />
               </div>
-              <p className="font-mono text-2xl font-bold text-white mt-2">
+              <p className="font-mono text-2xl font-bold text-slate-900 mt-2">
                 {stats?.total_transactions || 0}
               </p>
               <p className="text-xs text-swiss-text-muted uppercase tracking-wider mt-1">
@@ -159,13 +157,13 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <Globe className="w-5 h-5 text-swiss-text-muted" strokeWidth={1.5} />
                 <TrendingUp className="w-4 h-4 text-swiss-status-success" />
               </div>
-              <p className="font-mono text-2xl font-bold text-white mt-2">
+              <p className="font-mono text-2xl font-bold text-slate-900 mt-2">
                 {stats?.total_transfers || 0}
               </p>
               <p className="text-xs text-swiss-text-muted uppercase tracking-wider mt-1">
@@ -174,7 +172,7 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <Users className="w-5 h-5 text-swiss-text-muted" strokeWidth={1.5} />
@@ -182,7 +180,7 @@ const DashboardPage = () => {
                   +2
                 </Badge>
               </div>
-              <p className="font-mono text-2xl font-bold text-white mt-2">
+              <p className="font-mono text-2xl font-bold text-slate-900 mt-2">
                 {stats?.total_beneficiaries || 0}
               </p>
               <p className="text-xs text-swiss-text-muted uppercase tracking-wider mt-1">
@@ -191,13 +189,13 @@ const DashboardPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <RefreshCw className="w-5 h-5 text-swiss-text-muted" strokeWidth={1.5} />
                 <span className="status-dot status-operational" />
               </div>
-              <p className="font-mono text-2xl font-bold text-white mt-2">
+              <p className="font-mono text-2xl font-bold text-slate-900 mt-2">
                 {stats?.pending_transfers || 0}
               </p>
               <p className="text-xs text-swiss-text-muted uppercase tracking-wider mt-1">
@@ -209,7 +207,7 @@ const DashboardPage = () => {
 
         {/* Quick Actions */}
         <div className="lg:col-span-4">
-          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm h-full">
+          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm h-full">
             <CardHeader className="pb-3">
               <CardTitle className="font-heading text-sm text-swiss-text-secondary uppercase tracking-wider">
                 Quick Actions
@@ -220,18 +218,17 @@ const DashboardPage = () => {
                 <Link key={action.path} to={action.path}>
                   <Button
                     variant="ghost"
-                    className="w-full justify-between h-10 hover:bg-white/5 rounded-sm group"
-                    data-testid={`quick-action-${action.path.slice(1)}`}
+                    className="w-full justify-between h-10 hover:bg-slate-100 rounded-sm group"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-sm flex items-center justify-center ${action.color}`}>
                         <action.icon className="w-4 h-4" strokeWidth={1.5} />
                       </div>
-                      <span className="text-sm text-swiss-text-secondary group-hover:text-white transition-colors">
+                      <span className="text-sm text-swiss-text-secondary group-hover:text-slate-900 transition-colors">
                         {action.label}
                       </span>
                     </div>
-                    <ArrowUpRight className="w-4 h-4 text-swiss-text-muted group-hover:text-white transition-colors" />
+                    <ArrowUpRight className="w-4 h-4 text-swiss-text-muted group-hover:text-slate-900 transition-colors" />
                   </Button>
                 </Link>
               ))}
@@ -241,13 +238,13 @@ const DashboardPage = () => {
       </div>
 
       {/* Recent Transactions */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="font-heading text-lg text-white">
+          <CardTitle className="font-heading text-lg text-slate-900">
             Recent Transactions
           </CardTitle>
           <Link to="/transactions">
-            <Button variant="ghost" size="sm" className="text-swiss-text-secondary hover:text-white text-xs uppercase tracking-wider">
+            <Button variant="ghost" size="sm" className="text-swiss-text-secondary hover:text-slate-900 text-xs uppercase tracking-wider">
               View All
               <ArrowUpRight className="w-3 h-3 ml-1" />
             </Button>
@@ -264,7 +261,7 @@ const DashboardPage = () => {
                 {transactions.map((tx, index) => (
                   <div
                     key={tx.id || index}
-                    className="flex items-center justify-between p-3 bg-swiss-bg-subtle/50 rounded-sm border border-white/5"
+                    className="flex items-center justify-between p-3 bg-swiss-bg-subtle/50 rounded-sm border border-slate-100"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-sm flex items-center justify-center ${
@@ -277,7 +274,7 @@ const DashboardPage = () => {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm text-white">{tx.description}</p>
+                        <p className="text-sm text-slate-900">{tx.description}</p>
                         <p className="text-xs text-swiss-text-muted font-mono">{tx.reference}</p>
                       </div>
                     </div>
@@ -300,7 +297,7 @@ const DashboardPage = () => {
       </Card>
 
       {/* System Status */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

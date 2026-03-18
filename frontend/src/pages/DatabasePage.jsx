@@ -72,11 +72,11 @@ const DatabasePage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="database-page">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
             <Database className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             Database
           </h1>
@@ -87,8 +87,7 @@ const DatabasePage = () => {
         <Button
           onClick={fetchCollections}
           variant="outline"
-          className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm"
-          data-testid="refresh-db"
+          className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm"
         >
           <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -97,7 +96,7 @@ const DatabasePage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Collections List */}
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm lg:col-span-1">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm lg:col-span-1">
           <CardHeader>
             <CardTitle className="font-heading text-sm text-swiss-text-secondary uppercase tracking-wider flex items-center gap-2">
               <HardDrive className="w-4 h-4" />
@@ -124,9 +123,8 @@ const DatabasePage = () => {
                       className={`w-full justify-between h-auto py-3 px-3 rounded-sm ${
                         selectedCollection === col.name
                           ? 'bg-swiss-red text-white'
-                          : 'text-swiss-text-secondary hover:text-white hover:bg-white/5'
+                          : 'text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100'
                       }`}
-                      data-testid={`collection-${col.name}`}
                     >
                       <div className="flex items-center gap-2">
                         <span>{getCollectionIcon(col.name)}</span>
@@ -135,7 +133,7 @@ const DatabasePage = () => {
                       <div className="flex items-center gap-2">
                         <Badge className={`rounded-sm text-xs ${
                           selectedCollection === col.name
-                            ? 'bg-white/20 text-white'
+                            ? 'bg-white/20 text-slate-900'
                             : 'bg-swiss-bg-subtle text-swiss-text-muted'
                         }`}>
                           {col.count}
@@ -151,9 +149,9 @@ const DatabasePage = () => {
         </Card>
 
         {/* Collection Data */}
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm lg:col-span-3">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm lg:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+            <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
               <TableIcon className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
               {selectedCollection ? (
                 <>
@@ -186,7 +184,7 @@ const DatabasePage = () => {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-white/10 hover:bg-transparent">
+                    <TableRow className="border-slate-200 hover:bg-transparent">
                       {collectionData[0] && Object.keys(collectionData[0]).slice(0, 6).map((key) => (
                         <TableHead key={key} className="text-swiss-text-muted uppercase text-xs tracking-wider">
                           {key}
@@ -196,7 +194,7 @@ const DatabasePage = () => {
                   </TableHeader>
                   <TableBody>
                     {collectionData.map((doc, index) => (
-                      <TableRow key={index} className="border-white/5 hover:bg-white/5">
+                      <TableRow key={index} className="border-slate-100 hover:bg-slate-100">
                         {Object.keys(doc).slice(0, 6).map((key) => (
                           <TableCell key={key} className="font-mono text-xs text-swiss-text-secondary max-w-[200px] truncate">
                             {renderValue(doc[key])}
@@ -214,27 +212,27 @@ const DatabasePage = () => {
 
       {/* Database Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="p-4">
             <p className="text-swiss-text-muted text-xs uppercase tracking-wider mb-1">Collections</p>
-            <p className="font-mono text-2xl text-white">{collections.length}</p>
+            <p className="font-mono text-2xl text-slate-900">{collections.length}</p>
           </CardContent>
         </Card>
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="p-4">
             <p className="text-swiss-text-muted text-xs uppercase tracking-wider mb-1">Total Documents</p>
-            <p className="font-mono text-2xl text-white">
+            <p className="font-mono text-2xl text-slate-900">
               {collections.reduce((sum, col) => sum + col.count, 0)}
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="p-4">
             <p className="text-swiss-text-muted text-xs uppercase tracking-wider mb-1">Database</p>
-            <p className="font-mono text-lg text-white">MongoDB</p>
+            <p className="font-mono text-lg text-slate-900">MongoDB</p>
           </CardContent>
         </Card>
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <span className="status-dot status-operational" />

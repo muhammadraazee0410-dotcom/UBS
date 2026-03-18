@@ -109,11 +109,11 @@ const ServerConsolePage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="server-console-page">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
             <Terminal className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             Server Console
           </h1>
@@ -124,8 +124,7 @@ const ServerConsolePage = () => {
         <Button
           onClick={fetchLogs}
           variant="outline"
-          className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm"
-          data-testid="refresh-logs"
+          className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
           Refresh Logs
@@ -134,8 +133,8 @@ const ServerConsolePage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Terminal */}
-        <Card className="bg-black border-white/10 rounded-sm">
-          <CardHeader className="border-b border-white/10 py-3">
+        <Card className="bg-black border-slate-700 rounded-sm">
+          <CardHeader className="border-b border-slate-700 py-3">
             <CardTitle className="font-mono text-sm text-green-400 flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
               UBS-ADMIN-TERMINAL
@@ -164,7 +163,7 @@ const ServerConsolePage = () => {
                   ) : item.type === 'error' ? (
                     <div className="text-red-400 pl-6 whitespace-pre-wrap">{item.text}</div>
                   ) : (
-                    <div className="text-white pl-6 whitespace-pre-wrap">{item.text}</div>
+                    <div className="text-gray-300 pl-6 whitespace-pre-wrap">{item.text}</div>
                   )}
                 </div>
               ))}
@@ -180,7 +179,6 @@ const ServerConsolePage = () => {
                   className="flex-1 bg-transparent border-none text-green-400 font-mono text-sm focus:ring-0 focus-visible:ring-0 h-6 p-0"
                   placeholder={executing ? 'Executing...' : ''}
                   disabled={executing}
-                  data-testid="terminal-input"
                   autoComplete="off"
                 />
                 <span className="text-green-400 cursor-blink">▌</span>
@@ -190,9 +188,9 @@ const ServerConsolePage = () => {
         </Card>
 
         {/* Server Logs */}
-        <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="font-heading text-lg text-white">
+            <CardTitle className="font-heading text-lg text-slate-900">
               Server Logs
             </CardTitle>
             <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm text-xs">
@@ -205,7 +203,7 @@ const ServerConsolePage = () => {
                 {logs.map((log, index) => (
                   <div
                     key={index}
-                    className="p-3 bg-swiss-bg-subtle/50 rounded-sm border border-white/5 font-mono text-xs"
+                    className="p-3 bg-swiss-bg-subtle/50 rounded-sm border border-slate-100 font-mono text-xs"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -233,7 +231,7 @@ const ServerConsolePage = () => {
       </div>
 
       {/* Quick Commands */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardHeader>
           <CardTitle className="font-heading text-sm text-swiss-text-secondary uppercase tracking-wider">
             Quick Commands
@@ -250,8 +248,7 @@ const ServerConsolePage = () => {
                   setCommand(cmd);
                   inputRef.current?.focus();
                 }}
-                className="border-white/10 text-swiss-text-secondary hover:text-white hover:bg-white/5 rounded-sm font-mono text-xs"
-                data-testid={`quick-cmd-${cmd}`}
+                className="border-slate-200 text-swiss-text-secondary hover:text-slate-900 hover:bg-slate-100 rounded-sm font-mono text-xs"
               >
                 {cmd}
               </Button>

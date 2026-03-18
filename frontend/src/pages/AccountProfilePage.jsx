@@ -151,7 +151,7 @@ const AccountProfilePage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64" data-testid="account-profile-page">
+      <div className="flex items-center justify-center h-64">
         <RefreshCw className="w-6 h-6 animate-spin text-swiss-text-muted" />
       </div>
     );
@@ -162,11 +162,11 @@ const AccountProfilePage = () => {
   const { company, signatories, declaration } = profile;
 
   return (
-    <div className="space-y-6" data-testid="account-profile-page">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-heading font-black text-3xl text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
             <Building className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             Account Profile
           </h1>
@@ -177,7 +177,6 @@ const AccountProfilePage = () => {
         <Button
           onClick={printProfile}
           className="bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm"
-          data-testid="print-profile"
         >
           <Printer className="w-4 h-4 mr-2" />
           Print Profile
@@ -185,10 +184,10 @@ const AccountProfilePage = () => {
       </div>
 
       {/* Company Info Card */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm overflow-hidden">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm overflow-hidden">
         <div className="h-1 bg-swiss-red" />
         <CardHeader>
-          <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+          <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
             <Building className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
             Company Information
           </CardTitle>
@@ -211,11 +210,11 @@ const AccountProfilePage = () => {
       {/* Signatories */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {signatories.map((sig, idx) => (
-          <Card key={idx} className="bg-swiss-bg-paper border-white/10 rounded-sm overflow-hidden">
+          <Card key={idx} className="bg-swiss-bg-paper border-slate-200 rounded-sm overflow-hidden">
             <div className="h-1 bg-gradient-to-r from-swiss-red to-swiss-red/50" />
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+                <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
                   <User className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
                   {sig.name}
                 </CardTitle>
@@ -227,7 +226,7 @@ const AccountProfilePage = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <InfoRow icon={FileText} label="Title" value={sig.title} testId={`sig-${idx}-title`} />
-              <div className="h-px bg-white/5" />
+              <div className="h-px bg-slate-50" />
               <div className="bg-swiss-bg-subtle p-4 rounded-sm space-y-3">
                 <p className="text-[10px] text-swiss-text-muted uppercase tracking-widest mb-2">Passport Details</p>
                 <InfoRow icon={Hash} label="Passport N\u00b0" value={sig.passport_number} testId={`sig-${idx}-passport`} />
@@ -241,17 +240,17 @@ const AccountProfilePage = () => {
       </div>
 
       {/* Verification Table */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardHeader>
-          <CardTitle className="font-heading text-lg text-white flex items-center gap-2">
+          <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
             <Shield className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
             Signatory Verification
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <table className="w-full" data-testid="signatory-table">
+          <table className="w-full">
             <thead>
-              <tr className="bg-swiss-bg-subtle border-b border-white/10">
+              <tr className="bg-swiss-bg-subtle border-b border-slate-200">
                 <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Authorised By</th>
                 <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Passport No.</th>
                 <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Place of Issue</th>
@@ -261,8 +260,8 @@ const AccountProfilePage = () => {
             </thead>
             <tbody>
               {signatories.map((s, i) => (
-                <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02]">
-                  <td className="py-3 px-4 text-white text-sm font-medium">{s.name}</td>
+                <tr key={i} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="py-3 px-4 text-slate-900 text-sm font-medium">{s.name}</td>
                   <td className="py-3 px-4 font-mono text-sm text-swiss-text-secondary">{s.passport_number}</td>
                   <td className="py-3 px-4 text-sm text-swiss-text-secondary">{s.country_of_issue}</td>
                   <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">{s.date_of_issue}</td>
@@ -275,22 +274,22 @@ const AccountProfilePage = () => {
       </Card>
 
       {/* Declaration */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm overflow-hidden">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm overflow-hidden">
         <div className="h-1 bg-amber-500/50" />
         <CardHeader>
-          <CardTitle className="font-heading text-lg text-white">
+          <CardTitle className="font-heading text-lg text-slate-900">
             Sworn Declaration
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-sm" data-testid="declaration-text">
-            <p className="text-white text-sm leading-relaxed italic">
+          <div className="bg-amber-500/5 border border-amber-500/20 p-6 rounded-sm">
+            <p className="text-slate-900 text-sm leading-relaxed italic">
               {declaration}
             </p>
             <p className="text-swiss-text-secondary text-sm mt-4">
               For and on behalf of
             </p>
-            <p className="text-white font-bold text-sm mt-1">
+            <p className="text-slate-900 font-bold text-sm mt-1">
               {company.name}
             </p>
           </div>
@@ -299,8 +298,8 @@ const AccountProfilePage = () => {
           <div className="grid grid-cols-2 gap-8 mt-8">
             {signatories.map((s, i) => (
               <div key={i} className="text-center">
-                <div className="h-16 border-b-2 border-white/20 mb-3" />
-                <p className="text-white font-bold text-sm">{s.name}</p>
+                <div className="h-16 border-b-2 border-slate-300 mb-3" />
+                <p className="text-slate-900 font-bold text-sm">{s.name}</p>
                 <p className="text-swiss-text-muted text-xs">{s.title}</p>
                 <p className="text-swiss-text-muted text-xs font-mono mt-1">Passport: {s.passport_number}</p>
               </div>
@@ -310,7 +309,7 @@ const AccountProfilePage = () => {
       </Card>
 
       {/* Bank Verification Stamp */}
-      <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardContent className="py-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="border-2 border-swiss-red px-5 py-3 text-center rounded-sm">
@@ -319,7 +318,7 @@ const AccountProfilePage = () => {
               <p className="text-[8px] text-swiss-red uppercase tracking-widest">Verified & Recorded</p>
             </div>
             <div>
-              <p className="text-white text-sm font-medium">Account Verified</p>
+              <p className="text-slate-900 text-sm font-medium">Account Verified</p>
               <p className="text-swiss-text-muted text-xs">This account profile has been verified and recorded by Union Bank of Switzerland AG</p>
             </div>
           </div>
@@ -338,7 +337,7 @@ const InfoRow = ({ icon: Icon, label, value, testId, className = '' }) => (
     <Icon className="w-4 h-4 text-swiss-text-muted mt-0.5 flex-shrink-0" strokeWidth={1.5} />
     <div>
       <p className="text-[10px] text-swiss-text-muted uppercase tracking-wider">{label}</p>
-      <p className="text-white text-sm font-medium mt-0.5" data-testid={testId}>{value}</p>
+      <p className="text-slate-900 text-sm font-medium mt-0.5">{value}</p>
     </div>
   </div>
 );
