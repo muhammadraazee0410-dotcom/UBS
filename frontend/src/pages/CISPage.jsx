@@ -232,6 +232,49 @@ const CISPage = () => {
         </CardContent>
       </Card>
 
+      {/* Passport Documents */}
+      {signatories.some(s => s.passport_image) && (
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
+              Passport Document(s)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {signatories.filter(s => s.passport_image).map((s, i) => (
+                <div key={i} className="border border-slate-200 rounded-sm overflow-hidden">
+                  <div className="bg-swiss-bg-subtle px-4 py-2 flex items-center justify-between border-b border-slate-200">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-swiss-red" />
+                      <span className="text-sm text-slate-900 font-bold">{s.name}</span>
+                      <Badge className="bg-swiss-red/10 text-swiss-red rounded-sm text-[10px]">Passport N° {s.passport_number}</Badge>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-swiss-text-muted">
+                      <span>Issued: {s.date_of_issue}</span>
+                      <span>Expires: {s.date_of_expiry}</span>
+                    </div>
+                  </div>
+                  <div className="p-4 flex justify-center bg-slate-50">
+                    <img
+                      src={s.passport_image}
+                      alt={`Passport - ${s.name}`}
+                      className="max-w-full max-h-[500px] rounded-sm border border-slate-200 shadow-sm"
+                    />
+                  </div>
+                  {s.mrz && (
+                    <div className="bg-slate-900 px-4 py-2">
+                      <p className="font-mono text-[10px] text-green-400 tracking-wider">{s.mrz}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Services */}
       <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardHeader>
@@ -391,6 +434,20 @@ function buildPrintHTML(d) {
         ${signatories.map(s => `<tr><td style="font-weight:bold">${s.name}</td><td>${s.title}</td><td style="font-family:monospace">${s.passport_number || '—'}</td><td>${s.nationality}</td><td>${s.signing_authority || 'Full authority'}</td></tr>`).join('')}
       </tbody></table>
     </div>
+
+    ${signatories.filter(s => s.passport_image).map(s => `
+    <div class="section" style="page-break-before:always">
+      <div class="section-title">Passport Document — ${s.name}</div>
+      <div style="border:1px solid #ddd;padding:10px;margin:10px 0">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #eee">
+          <div><strong>${s.name}</strong> — Passport N° ${s.passport_number}</div>
+          <div style="font-size:9px;color:#666">Issued: ${s.date_of_issue} | Expires: ${s.date_of_expiry}</div>
+        </div>
+        <div style="text-align:center"><img src="${s.passport_image}" style="max-width:100%;max-height:500px;border:1px solid #ddd" alt="Passport"></div>
+        ${s.mrz ? `<div style="background:#000;color:#0f0;padding:6px 10px;margin-top:10px;font-family:monospace;font-size:9px;letter-spacing:1px">${s.mrz}</div>` : ''}
+      </div>
+    </div>
+    `).join('')}
 
     <div class="section">
       <div class="section-title">Banking Services</div>

@@ -977,6 +977,7 @@ async def get_cis(payload: dict = Depends(verify_token)):
                 "date_of_expiry": "10.10.2033",
                 "issuing_authority": "Aargau AG",
                 "mrz": "PMCHEHUNZIKER<<ERICH / S1B4753<4CHE5309153M3310104",
+                "passport_image": "https://customer-assets.emergentagent.com/job_10a739d3-c9f8-41a3-878d-904e8c09e1cd/artifacts/yp8shjfw_IMG-20260319-WA0010.jpg",
             },
             {
                 "name": "DR. SERGE COTTENCON",
