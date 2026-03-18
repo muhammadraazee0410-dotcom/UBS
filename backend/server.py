@@ -897,6 +897,46 @@ async def get_collection_data(collection: str, limit: int = 50, payload: dict = 
     docs = await db[collection].find({}, {"_id": 0}).to_list(limit)
     return docs
 
+# ================ ACCOUNT PROFILE ================
+
+@api_router.get("/account-profile")
+async def get_account_profile(payload: dict = Depends(verify_token)):
+    return {
+        "company": {
+            "name": "BB BIOTECH AG",
+            "id_number": "CHE-102.169.627",
+            "address": "SCHWERTSTRASSE 6",
+            "postal_code": "8200",
+            "city": "SCHAFFHAUSEN",
+            "region": "ZURICH",
+            "country": "SWITZERLAND",
+        },
+        "signatories": [
+            {
+                "name": "DR. ERICH HUNZIKER",
+                "title": "POA Holder/Authorised Signatory",
+                "passport_number": "X4765274",
+                "country_of_issue": "SWITZERLAND",
+                "date_of_issue": "12 MAR 2015",
+                "date_of_expiry": "11 MAR 2025",
+            },
+            {
+                "name": "DR. SERGE COTTENCON",
+                "title": "POA Holder/Authorised Signatory",
+                "passport_number": "14DA52103",
+                "country_of_issue": "FRANCE",
+                "date_of_issue": "04.09.2014",
+                "date_of_expiry": "03.09.2024",
+            },
+        ],
+        "declaration": "I, DR. ERICH HUNZIKER & SERGE COTTENCON hereby swear under penalty of perjury, that the information provided herein is accurate and true as of this date.",
+        "bank": {
+            "name": "UNION BANK OF SWITZERLAND AG",
+            "swift": "UBSWCHZHXXX",
+            "address": "BAHNHOFSTRASSE 45, 8001 ZURICH, SWITZERLAND",
+        },
+    }
+
 # ================ ACCOUNT STATEMENT ================
 
 STATIC_BALANCES = {

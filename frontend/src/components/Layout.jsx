@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Globe,
   Building2,
+  Building,
   Receipt,
   History,
   MapPin,
@@ -32,6 +33,7 @@ import { ScrollArea } from './ui/scroll-area';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/account-profile', label: 'Account Profile', icon: Building },
   { path: '/international-transfer', label: 'International Transfer', icon: Globe },
   { path: '/domestic-transfer', label: 'Domestic Transfer', icon: Building2 },
   { path: '/bill-payment', label: 'Bill Payment', icon: Receipt },

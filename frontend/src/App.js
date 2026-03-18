@@ -3,6 +3,7 @@ import { Toaster } from "./components/ui/sonner";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import AccountProfilePage from "./pages/AccountProfilePage";
 import InternationalTransferPage from "./pages/InternationalTransferPage";
 import DomesticTransferPage from "./pages/DomesticTransferPage";
 import BillPaymentPage from "./pages/BillPaymentPage";
@@ -48,6 +49,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<DashboardPage />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/account-profile" element={<AccountProfilePage />} />
                     <Route path="/international-transfer" element={<InternationalTransferPage />} />
                     <Route path="/domestic-transfer" element={<DomesticTransferPage />} />
                     <Route path="/bill-payment" element={<BillPaymentPage />} />
