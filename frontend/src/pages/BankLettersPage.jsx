@@ -23,6 +23,7 @@ const formatCurrency = (amount, currency) =>
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
 const letterTabs = [
+  { id: 'auth-balance', label: 'Authorised Balance', icon: Shield },
   { id: 'relationship', label: 'Account Relationship', icon: Landmark },
   { id: 'officer', label: 'Bank Officer', icon: User },
   { id: 'reference', label: 'Bank Reference', icon: FileCheck },
@@ -32,7 +33,7 @@ const letterTabs = [
 const BankLettersPage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('relationship');
+  const [activeTab, setActiveTab] = useState('auth-balance');
 
   useEffect(() => {
     (async () => {
@@ -46,7 +47,8 @@ const BankLettersPage = () => {
 
   const printLetter = () => {
     if (!data) return;
-    const html = activeTab === 'relationship' ? buildRelationshipHTML(data)
+    const html = activeTab === 'auth-balance' ? buildAuthBalanceHTML(data)
+      : activeTab === 'relationship' ? buildRelationshipHTML(data)
       : activeTab === 'officer' ? buildOfficerHTML(data)
       : activeTab === 'reference' ? buildReferenceHTML(data)
       : buildAssetControlHTML(data);
@@ -60,7 +62,7 @@ const BankLettersPage = () => {
   if (loading) return <div className="flex items-center justify-center h-64" data-testid="bank-letters-page"><RefreshCw className="w-6 h-6 animate-spin text-swiss-text-muted" /></div>;
   if (!data) return null;
 
-  const { profile: p, officer: o, balances, references: refs } = data;
+  const { profile: p, officer: o, balances, references: refs, signatories: sigs } = data;
 
   return (
     <div className="space-y-6" data-testid="bank-letters-page">
@@ -85,6 +87,121 @@ const BankLettersPage = () => {
             </TabsTrigger>
           ))}
         </TabsList>
+
+        {/* ===== AUTHORISED BALANCE CONFIRMATION ===== */}
+        <TabsContent value="auth-balance">
+          <Card className="bg-swiss-bg-paper border-white/10 rounded-sm">
+            <CardContent className="p-0">
+              <ScrollArea className="h-[650px]">
+                <div className="p-8 space-y-6">
+                  <LetterHead date={data.date} refNum={refs.auth_balance_ref} />
+                  <div className="text-center">
+                    <h2 className="font-heading font-bold text-lg text-white uppercase tracking-wider">Authorised Bank Balance Confirmation</h2>
+                    <p className="text-swiss-text-muted text-xs mt-1">STRICTLY CONFIDENTIAL — AUTHORISED SIGNATORIES</p>
+                  </div>
+                  <LetterTo />
+                  <div className="space-y-4 text-sm text-swiss-text-secondary leading-relaxed">
+                    <p>We, <span className="text-white font-bold">Union Bank of Switzerland AG (UBS)</span>, SWIFT: UBSWCHZHXXX, Bahnhofstrasse 45, 8001 Zurich, Switzerland, hereby issue this official bank balance confirmation letter at the request and authorisation of the duly appointed signatories of <span className="text-white font-bold">{p.company_name}</span> (Company ID N° {p.company_id}).</p>
+
+                    {/* Authorised Signatories Section */}
+                    <div className="bg-swiss-bg-subtle border border-white/10 p-5 rounded-sm">
+                      <p className="text-[10px] text-swiss-red uppercase tracking-widest mb-4 font-bold">Authorised Signatories</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {sigs && sigs.map((s, i) => (
+                          <div key={i} className="bg-swiss-bg-paper border border-white/5 p-4 rounded-sm">
+                            <div className="flex items-center justify-between mb-3">
+                              <p className="text-white font-bold text-sm">{s.name}</p>
+                              <Badge className="bg-swiss-red/10 text-swiss-red border border-swiss-red/30 rounded-sm text-[10px]">
+                                <Shield className="w-3 h-3 mr-1" />Authorised
+                              </Badge>
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Title:</span><span className="text-swiss-text-secondary text-xs">{s.title}</span></div>
+                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Passport N°:</span><span className="text-white text-xs font-mono">{s.passport_number}</span></div>
+                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Country:</span><span className="text-swiss-text-secondary text-xs">{s.country_of_issue}</span></div>
+                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Issued:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_issue}</span></div>
+                              <div className="flex"><span className="w-28 text-swiss-text-muted text-[10px] uppercase">Expires:</span><span className="text-swiss-text-secondary text-xs font-mono">{s.date_of_expiry}</span></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <p>Acting in their capacity as duly authorised POA Holders and Signatories, the above-named individuals have authorised the bank to confirm the following account balances held with Union Bank of Switzerland AG:</p>
+
+                    {/* Balance Confirmation Table */}
+                    <div className="border border-white/10 rounded-sm overflow-hidden">
+                      <div className="bg-swiss-red/10 px-4 py-2">
+                        <p className="text-swiss-red text-[10px] uppercase tracking-widest font-bold">Confirmed Account Balances</p>
+                      </div>
+                      <table className="w-full" data-testid="auth-balance-table">
+                        <thead>
+                          <tr className="bg-swiss-bg-subtle border-b border-white/10">
+                            <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Currency</th>
+                            <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Account Number</th>
+                            <th className="text-left py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">IBAN</th>
+                            <th className="text-right py-3 px-4 text-swiss-text-muted uppercase text-[10px] tracking-wider">Confirmed Balance</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {balances.map((b, i) => (
+                            <tr key={b.currency} className="border-b border-white/5">
+                              <td className="py-3 px-4"><Badge className="bg-swiss-red/10 text-swiss-red rounded-sm text-xs">{b.currency}</Badge></td>
+                              <td className="py-3 px-4 font-mono text-xs text-swiss-text-secondary">{b.account_number}</td>
+                              <td className="py-3 px-4 font-mono text-xs text-swiss-text-muted">{b.iban}</td>
+                              <td className="py-3 px-4 text-right font-mono text-sm text-white font-bold">{formatCurrency(b.balance, b.currency)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p>The bank hereby confirms that:</p>
+                    <div className="space-y-3">
+                      <ConfirmItem num="1" title="Authenticity of Balances" text="The above balances are authentic, accurate, and verified as of the date of this letter. They represent the true and correct funds held in the respective accounts." />
+                      <ConfirmItem num="2" title="Signatory Authority" text={`The balances are confirmed under the joint authorisation of ${sigs ? sigs.map(s => s.name).join(' and ') : ''}, who hold valid Power of Attorney over the accounts of ${p.company_name}.`} />
+                      <ConfirmItem num="3" title="Funds Availability" text="The confirmed balances are available, unencumbered, and not subject to any liens, holds, pledges, or restrictions. The funds may be utilised or transferred upon proper instruction from the authorised signatories." />
+                      <ConfirmItem num="4" title="Regulatory Compliance" text="All funds have been verified in compliance with Swiss FINMA regulations, Anti-Money Laundering (AML) directives, and Know Your Customer (KYC) requirements." />
+                    </div>
+
+                    <div className="bg-amber-500/5 border border-amber-500/20 p-4 rounded-sm mt-4">
+                      <p className="text-amber-300 text-xs font-bold uppercase tracking-wider mb-2">Declaration</p>
+                      <p className="text-swiss-text-secondary text-xs italic">This balance confirmation is issued at the express request and authorisation of the account signatories named herein. It is valid as of the date of issuance and is intended solely for the use of the addressee. Union Bank of Switzerland AG shall bear no liability for any reliance placed upon this confirmation by third parties.</p>
+                    </div>
+                  </div>
+
+                  {/* Dual Signatory Block */}
+                  <div className="border-t border-white/10 pt-6 mt-6">
+                    <p className="text-xs text-swiss-text-muted mb-6">Authorised and confirmed by:</p>
+                    <div className="grid grid-cols-2 gap-8">
+                      {sigs && sigs.map((s, i) => (
+                        <div key={i} className="text-center">
+                          <div className="h-14 border-b-2 border-white/20 mb-3" />
+                          <p className="text-white font-bold text-sm">{s.name}</p>
+                          <p className="text-swiss-text-muted text-xs">{s.title}</p>
+                          <p className="text-swiss-text-muted text-xs font-mono mt-1">Passport: {s.passport_number}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bank Officer Countersign */}
+                  <div className="border-t border-white/10 pt-6">
+                    <p className="text-xs text-swiss-text-muted mb-1">Countersigned and verified by the Bank:</p>
+                    <div className="mt-8 border-t-2 border-white/20 pt-3 max-w-xs">
+                      <p className="text-white font-bold text-sm">{o.name}</p>
+                      <p className="text-swiss-text-muted text-xs">{o.title}</p>
+                      <p className="text-swiss-text-muted text-xs">{o.department}</p>
+                      <p className="text-swiss-text-muted text-xs font-mono mt-1">Officer ID: {o.officer_id}</p>
+                    </div>
+                  </div>
+
+                  <LetterStamp refNum={refs.auth_balance_ref} />
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* ===== RELATIONSHIP LETTER ===== */}
         <TabsContent value="relationship">
@@ -480,5 +597,94 @@ function buildAssetControlHTML(d) {
       <div class="notice"><strong>IMPORTANT NOTICE:</strong> This letter is issued without any liability or obligation on the part of Union Bank of Switzerland AG and is subject to the general terms and conditions governing the banking relationship.</div>
     </div>
     ${sigHTML(o)}${stampHTML(r.asset_ref)}
+  </body></html>`;
+}
+
+
+function buildAuthBalanceHTML(d) {
+  const {profile:p, officer:o, balances, references:r, signatories:sigs} = d;
+  const sigList = sigs || [];
+  return `<html><head><title>UBS - Authorised Bank Balance Confirmation</title><style>${letterCSS()}
+    .sig-grid { display:flex; justify-content:space-around; margin:30px 0; }
+    .sig-col { text-align:center; width:280px; }
+    .sig-col .line { border-top:2px solid #000; margin-top:50px; padding-top:8px; }
+    .counter-sig { border-top:2px solid #000; margin-top:40px; padding-top:8px; max-width:300px; }
+  </style></head><body>
+    ${hdrHTML(d.date, r.auth_balance_ref)}
+    <div class="title">Authorised Bank Balance Confirmation</div>
+    <div class="sub">STRICTLY CONFIDENTIAL — AUTHORISED SIGNATORIES</div>
+    <div class="to-box">To Whom It May Concern / All Interested Parties</div>
+    <div class="section">
+      <p>We, <strong>Union Bank of Switzerland AG (UBS)</strong>, SWIFT: UBSWCHZHXXX, Bahnhofstrasse 45, 8001 Zurich, Switzerland, hereby issue this official bank balance confirmation letter at the request and authorisation of the duly appointed signatories of <strong>${p.company_name}</strong> (Company ID N\u00b0 ${p.company_id}).</p>
+
+      <div style="margin:20px 0;border:1px solid #ccc;padding:15px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#DC2626;font-weight:bold;margin-bottom:12px;">Authorised Signatories</div>
+        ${sigList.map((s,i) => `
+          <div style="border:1px solid #ddd;padding:12px;margin-bottom:${i<sigList.length-1?'10':'0'}px;background:#fafafa;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <strong>${s.name}</strong>
+              <span style="border:1px solid #DC2626;color:#DC2626;padding:1px 8px;font-size:9px;">AUTHORISED</span>
+            </div>
+            <div class="info-row"><span class="info-label">Title:</span><span class="info-value">${s.title}</span></div>
+            <div class="info-row"><span class="info-label">Passport N\u00b0:</span><span class="info-value">${s.passport_number}</span></div>
+            <div class="info-row"><span class="info-label">Country of Issue:</span><span class="info-value">${s.country_of_issue}</span></div>
+            <div class="info-row"><span class="info-label">Date of Issue:</span><span class="info-value">${s.date_of_issue}</span></div>
+            <div class="info-row"><span class="info-label">Date of Expiry:</span><span class="info-value">${s.date_of_expiry}</span></div>
+          </div>
+        `).join('')}
+      </div>
+
+      <p>Acting in their capacity as duly authorised POA Holders and Signatories, the above-named individuals have authorised the bank to confirm the following account balances held with Union Bank of Switzerland AG:</p>
+
+      <div style="margin:15px 0;border:2px solid #DC2626;">
+        <div style="background:#DC2626;color:#fff;padding:8px 12px;font-size:10px;text-transform:uppercase;letter-spacing:2px;font-weight:bold;">Confirmed Account Balances</div>
+        <table>
+          <thead><tr><th>Currency</th><th>Account Number</th><th>IBAN</th><th style="text-align:right;">Confirmed Balance</th></tr></thead>
+          <tbody>
+            ${balances.map(b => `<tr>
+              <td style="font-weight:bold;">${b.currency}</td>
+              <td style="font-family:monospace;">${b.account_number}</td>
+              <td style="font-family:monospace;font-size:9px;">${b.iban}</td>
+              <td style="text-align:right;font-weight:bold;font-family:monospace;font-size:12px;">${fmtC(b.balance, b.currency)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <p>The bank hereby confirms that:</p>
+      <div class="confirm-box"><div class="confirm-title">1. Authenticity of Balances</div>The above balances are authentic, accurate, and verified as of the date of this letter. They represent the true and correct funds held in the respective accounts.</div>
+      <div class="confirm-box"><div class="confirm-title">2. Signatory Authority</div>The balances are confirmed under the joint authorisation of ${sigList.map(s=>s.name).join(' and ')}, who hold valid Power of Attorney over the accounts of ${p.company_name}.</div>
+      <div class="confirm-box"><div class="confirm-title">3. Funds Availability</div>The confirmed balances are available, unencumbered, and not subject to any liens, holds, pledges, or restrictions. The funds may be utilised or transferred upon proper instruction from the authorised signatories.</div>
+      <div class="confirm-box"><div class="confirm-title">4. Regulatory Compliance</div>All funds have been verified in compliance with Swiss FINMA regulations, Anti-Money Laundering (AML) directives, and Know Your Customer (KYC) requirements.</div>
+
+      <div class="notice"><strong>DECLARATION:</strong> This balance confirmation is issued at the express request and authorisation of the account signatories named herein. It is valid as of the date of issuance and is intended solely for the use of the addressee. Union Bank of Switzerland AG shall bear no liability for any reliance placed upon this confirmation by third parties.</div>
+    </div>
+
+    <div style="margin-top:25px;border-top:1px solid #ccc;padding-top:15px;">
+      <div style="font-size:10px;color:#666;margin-bottom:5px;">Authorised and confirmed by:</div>
+      <div class="sig-grid">
+        ${sigList.map(s => `
+          <div class="sig-col">
+            <div class="line">
+              <div style="font-weight:bold;">${s.name}</div>
+              <div style="font-size:9px;color:#666;">${s.title}</div>
+              <div style="font-size:9px;font-family:monospace;">Passport: ${s.passport_number}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div style="margin-top:15px;border-top:1px solid #ccc;padding-top:10px;">
+      <div style="font-size:10px;color:#666;">Countersigned and verified by the Bank:</div>
+      <div class="counter-sig">
+        <div style="font-weight:bold;">${o.name}</div>
+        <div style="font-size:9px;color:#666;">${o.title}</div>
+        <div style="font-size:9px;color:#666;">${o.department}</div>
+        <div style="font-size:9px;font-family:monospace;">Officer ID: ${o.officer_id} | Tel: ${o.direct_line}</div>
+      </div>
+    </div>
+
+    ${stampHTML(r.auth_balance_ref)}
   </body></html>`;
 }
