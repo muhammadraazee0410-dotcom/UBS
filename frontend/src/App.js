@@ -16,6 +16,7 @@ import DatabasePage from "./pages/DatabasePage";
 import DocumentsPage from "./pages/DocumentsPage";
 import StatementPage from "./pages/StatementPage";
 import CISPage from "./pages/CISPage";
+import LedgerTransferPage from "./pages/LedgerTransferPage";
 import Layout from "./components/Layout";
 import "./App.css";
 
@@ -54,6 +55,7 @@ function App() {
                     <Route path="/account-profile" element={<AccountProfilePage />} />
                     <Route path="/bank-letters" element={<BankLettersPage />} />
                     <Route path="/cis" element={<CISPage />} />
+                    <Route path="/ledger-transfer" element={<LedgerTransferPage />} />
                     <Route path="/international-transfer" element={<InternationalTransferPage />} />
                     <Route path="/domestic-transfer" element={<DomesticTransferPage />} />
                     <Route path="/bill-payment" element={<BillPaymentPage />} />

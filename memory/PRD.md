@@ -41,6 +41,7 @@ CREATE UNION BANK OF SWITZERLAND AG BANK ADMIN PORTAL WITH INCLUDES ALL BANKING 
 - [x] Transaction History with search/filter + View Receipt modal (MT103 Answer Back)
 - [x] Payment Tracking with SWIFT GPI timeline visualization
 - [x] Beneficiary Management (CRUD)
+- [x] **Ledger to Ledger Transfer** — SWIFT FIN terminal-style transfer with full receipt (SSL chain, GLOBAL ACK, SWIFT message fields, transmission codes, answerback, hex dump, TLS), Print PDF
 - [x] **CIS (Customer Information Sheet)** — Combined UBS & BB BIOTECH AG document with bank details, client entity, relationship manager, compliance/KYC status, accounts, signatories, services, Print PDF
 - [x] **Bank Letters Page** with 5 official UBS letter types: Authorised Balance Confirmation (with dual signatory authority + confirmed balances), Account Relationship, Bank Officer, Bank Reference, Asset Control — all with Print PDF
 - [x] **Account Profile Page** with BB BIOTECH AG company info, two authorised signatories (Dr. Hunziker & Dr. Cottencon), passport details, sworn declaration, signature blocks, Print PDF

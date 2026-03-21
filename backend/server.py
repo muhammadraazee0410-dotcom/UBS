@@ -897,6 +897,153 @@ async def get_collection_data(collection: str, limit: int = 50, payload: dict = 
     docs = await db[collection].find({}, {"_id": 0}).to_list(limit)
     return docs
 
+# ================ LEDGER TO LEDGER TRANSFER ================
+
+class LedgerTransferRequest(BaseModel):
+    sender_name: str
+    sender_company: str = ""
+    sender_account: str
+    sender_iban: str = ""
+    receiver_bank_name: str
+    receiver_bank_address: str = ""
+    receiver_swift: str
+    receiver_account: str
+    receiver_iban: str = ""
+    receiver_name: str
+    amount: float
+    currency: str = "EUR"
+    purpose: str = "INVESTMENT / INTERNAL LEDGER"
+
+@api_router.post("/transfers/ledger")
+async def create_ledger_transfer(req: LedgerTransferRequest, payload: dict = Depends(verify_token)):
+    now = datetime.now(timezone.utc)
+    tx_id = f"{random.randint(10000000,99999999)}CH{random.randint(100000,999999)}"
+    ref_num = f"UBSW{random.randint(1000000000,9999999999)}{random.randint(100000,999999)}"
+    msg_code = f"CH{random.randint(1000000000,9999999999)}"
+    deposit_code = f"UBSW{random.randint(10000000,99999999)}"
+    scf_num = f"SCF-{random.randint(1,9)}B{random.randint(1000000000,9999999999)}"
+    link_code = str(random.randint(100000000,999999999))
+    channel_code = str(random.randint(100000000000,999999999999))
+    sat_code = f"{random.randint(100000000000,999999999999)}.0XC{random.randint(1000000,9999999)}E{random.randint(10,99)}.UBS{random.randint(100,999)}"
+    identity_code = f"27C UBS CH ZH {random.randint(10,99)}BEH"
+    sort_code = f"{random.randint(100,999)} {random.randint(100,999)} {random.randint(10,99)}"
+    release_code = f"UBSW{random.randint(10000000000000,99999999999999)}"
+    access_code = f"UBSW{random.randint(1000000,9999999)}"
+    bonding_key = f"SP{random.randint(10000000000,99999999999)}"
+    activation_code = f"{random.randint(1000000,9999999)}/GM{random.randint(10000000,99999999)}"
+    feds_code = f"F-{random.randint(10000000,99999999)}.{random.randint(1000,9999)}.G{random.randint(100,999)}-{random.randint(1000,9999)}-{random.randint(1000,9999)}-{random.randint(1000,9999)}-{random.randint(100,999)}"
+    intl_deposit = f"UBS{random.randint(100000000,999999999)} LTOL/ NO. {random.randint(10000,99999)}-CA-{random.randint(10000,99999)}"
+    dep_tx = f"LEG/NOG{random.randint(100,999)}-{random.randint(1000,9999)}-{random.randint(1000,9999)}.G{random.randint(1000,9999)}-{random.randint(1000,9999)}-{random.randint(1000,9999)}"
+    seq_num = random.randint(100000,999999)
+
+    # hex dump lines
+    hex_lines = []
+    for i in range(10):
+        addr = f"{i*16:04X}"
+        b = [f"{random.choice('0123456789ABCDEF')}{random.choice('0123456789ABCDEF')}" for _ in range(8)]
+        hex_lines.append(f"{addr} - {' '.join(b[:4])}-{' '.join(b[4:])} {random.choice('.:*<>?/')}{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}{random.choice('0123456789')}{random.choice('0123456789')}")
+
+    formatted_amount = f"{req.currency} {req.amount:,.2f}"
+
+    receipt = {
+        "transfer_id": str(uuid.uuid4()),
+        "timestamp": now.isoformat(),
+        "formatted_time": now.strftime("%A, %B %d, %Y %H:%M:%S"),
+        "delivery_datetime": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "connection": {
+            "ip": "194.150.245.0/24",
+            "cert_chain": "Depth=2 c=CH, O=\"Symantec Corporation\", OU=Symantec Trust Network, CN=Symantec Class 3 public Primary Certificate Authority - G5",
+            "cert_subject": "S:/1.3.6.1.4.1.311.60.2.1.3=Switzerland/1.3.6.1.4.1.311.60.2.1=Bahnhofstrasse 45, 8001 Zurich/businessCategory=Private organization/serialNumber=CHE102169627/C=Switzerland/O=Union Bank of Switzerland AG",
+            "cert_issuer": "i:/C=Switzerland/O=Symantec Corporation/OU=Symantec Trust Network/CN=Symantec Class 3 EV SSL CA - G3",
+        },
+        "sender": {
+            "swift": "UBSWCHZHXXX",
+            "ip": "194.150.245.0/24",
+            "network_status": "GLOBAL ACK",
+            "server_id": f"AS{random.randint(1000,9999)}",
+            "tx_id": tx_id,
+            "serial_id": f"ISP{random.randint(1,9)}CH{random.randint(10,99)}D{random.randint(10,99)}",
+            "srv_names": [
+                "SRV1 NAME = IP_BANKINGUBS1.UBS.COM",
+                "SRV2 NAME = IP_BANKINGUBS2.UBS.COM",
+                "SRV3 NAME = IP_BANKINGUBS3.UBS.COM",
+            ],
+            "identity_code": identity_code,
+            "name": req.sender_name,
+            "company": req.sender_company or "BB BIOTECH AG",
+            "bank_address": "BAHNHOFSTRASSE 45, 8001, ZURICH, SWITZERLAND",
+            "account": req.sender_account,
+            "iban": req.sender_iban,
+        },
+        "receiver": {
+            "bank_name": req.receiver_bank_name,
+            "bank_address": req.receiver_bank_address,
+            "swift": req.receiver_swift,
+            "account": req.receiver_account,
+            "iban": req.receiver_iban,
+            "name": req.receiver_name,
+            "server_ip": f"{random.randint(100,255)}.{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}",
+            "server_id": f"AS{random.randint(10000,99999)}",
+        },
+        "amount": formatted_amount,
+        "raw_amount": req.amount,
+        "currency": req.currency,
+        "purpose": req.purpose,
+        "codes": {
+            "msg_code": msg_code,
+            "tx_id": tx_id,
+            "ref_num": ref_num,
+            "scf_num": scf_num,
+            "link_code": link_code,
+            "channel_code": channel_code,
+            "deposit_code": deposit_code,
+            "blocking_code": "SET BY RECEIVING BANK",
+            "reference_code": f"{random.randint(1000,9999)}-{random.randint(1000,9999)}-G{random.randint(100,999)}-{random.randint(1000,9999)}-{ref_num}",
+            "feds_code": feds_code,
+            "security_code": "SET BY RECEIVING BANK",
+            "withdrawal_feds_code": "SET BY RECEIVING BANK",
+            "intl_deposit_code": intl_deposit,
+            "deposit_tx": dep_tx,
+            "sat_code": sat_code,
+            "identity_code": identity_code,
+            "sort_code": sort_code,
+            "release_code": release_code,
+            "access_code": access_code,
+            "bonding_key": bonding_key,
+            "activation_code": activation_code,
+        },
+        "answerback": {
+            "status": "DELIVERED",
+            "sender": "UNION BANK OF SWITZERLAND AG",
+            "category_code": "RF",
+            "sequence_number": seq_num,
+            "receipt_swift": "UBSWCHZHXXX",
+        },
+        "hex_dump": hex_lines,
+        "tls": {
+            "depth": "DEPTH=L C=CH, O=SYMANTEC CORPORATION, OU=SYMANTEC TRUST NETWORK, CH=SYMANTEC CLASS 3 SECURE SERVER CA - G4 VERIFY RETURN: CORRESPONDING",
+            "psk": "NONE",
+            "srp": "NONE",
+            "ticket_lifetime": "6800 (SECONDS)",
+        },
+    }
+
+    # Save to DB
+    tx_record = {
+        "id": receipt["transfer_id"],
+        "type": "LEDGER_TO_LEDGER",
+        "transaction_type": "debit",
+        "amount": -req.amount,
+        "currency": req.currency,
+        "description": f"L2L Transfer to {req.receiver_name} via {req.receiver_bank_name}",
+        "reference": ref_num,
+        "status": "completed",
+        "created_at": now,
+    }
+    await db.transactions.insert_one(tx_record)
+
+    return receipt
+
 # ================ CIS (Customer Information Sheet) ================
 
 @api_router.get("/cis")

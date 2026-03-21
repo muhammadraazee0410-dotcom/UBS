@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   Globe,
+  ArrowRightLeft,
   Building2,
   Building,
   Mail,
@@ -38,6 +39,7 @@ const navItems = [
   { path: '/bank-letters', label: 'Bank Letters', icon: Mail },
   { path: '/cis', label: 'CIS Document', icon: FileText },
   { path: '/international-transfer', label: 'International Transfer', icon: Globe },
+  { path: '/ledger-transfer', label: 'Ledger to Ledger', icon: ArrowRightLeft },
   { path: '/domestic-transfer', label: 'Domestic Transfer', icon: Building2 },
   { path: '/bill-payment', label: 'Bill Payment', icon: Receipt },
   { path: '/transactions', label: 'Transaction History', icon: History },
