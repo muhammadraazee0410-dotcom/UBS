@@ -916,7 +916,7 @@ class LedgerTransferRequest(BaseModel):
 
 @api_router.post("/transfers/ledger")
 async def create_ledger_transfer(req: LedgerTransferRequest, payload: dict = Depends(verify_token)):
-    now = datetime.now(timezone.utc)
+    now = datetime(2025, 3, 21, 10, 30, 0, tzinfo=timezone.utc)
     tx_id = f"{random.randint(10000000,99999999)}CH{random.randint(100000,999999)}"
     ref_num = f"UBSW{random.randint(1000000000,9999999999)}{random.randint(100000,999999)}"
     msg_code = f"CH{random.randint(1000000000,9999999999)}"
@@ -1098,6 +1098,7 @@ async def create_ledger_transfer(req: LedgerTransferRequest, payload: dict = Dep
     receipt["nostro_routing"] = nostro_routing
 
     # Save to DB
+    actual_now = datetime.now(timezone.utc)
     tx_record = {
         "id": receipt["transfer_id"],
         "type": "LEDGER_TO_LEDGER",
@@ -1107,12 +1108,12 @@ async def create_ledger_transfer(req: LedgerTransferRequest, payload: dict = Dep
         "description": f"L2L Transfer to {req.receiver_name} via {req.receiver_bank_name}",
         "reference": ref_num,
         "status": "completed",
-        "created_at": now,
+        "created_at": actual_now,
     }
     await db.transactions.insert_one(tx_record)
 
     # Save full receipt for L2L Documents page
-    l2l_doc = {**receipt, "created_at": now}
+    l2l_doc = {**receipt, "created_at": actual_now}
     await db.l2l_receipts.insert_one(l2l_doc)
 
     return receipt

@@ -36,7 +36,7 @@ const LedgerTransferPage = () => {
     receiver_account: '165758772838',
     receiver_iban: '',
     receiver_name: 'HONG KONG UNIWORLD LIMITED',
-    amount: '99000000',
+    amount: '10000000000',
     currency: 'EUR',
     purpose: 'INVESTMENT / INTERNAL LEDGER',
   });
