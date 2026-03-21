@@ -42,6 +42,7 @@ const navItems = [
   { path: '/international-transfer', label: 'International Transfer', icon: Globe },
   { path: '/ledger-transfer', label: 'Ledger to Ledger', icon: ArrowRightLeft },
   { path: '/l2l-documents', label: 'L2L Documents', icon: FolderOpen },
+  { path: '/email-console', label: 'Email Console', icon: Mail },
   { path: '/domestic-transfer', label: 'Domestic Transfer', icon: Building2 },
   { path: '/bill-payment', label: 'Bill Payment', icon: Receipt },
   { path: '/transactions', label: 'Transaction History', icon: History },

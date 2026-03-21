@@ -18,6 +18,7 @@ import StatementPage from "./pages/StatementPage";
 import CISPage from "./pages/CISPage";
 import LedgerTransferPage from "./pages/LedgerTransferPage";
 import L2LDocumentsPage from "./pages/L2LDocumentsPage";
+import EmailConsolePage from "./pages/EmailConsolePage";
 import Layout from "./components/Layout";
 import "./App.css";
 
@@ -58,6 +59,7 @@ function App() {
                     <Route path="/cis" element={<CISPage />} />
                     <Route path="/ledger-transfer" element={<LedgerTransferPage />} />
                     <Route path="/l2l-documents" element={<L2LDocumentsPage />} />
+                    <Route path="/email-console" element={<EmailConsolePage />} />
                     <Route path="/international-transfer" element={<InternationalTransferPage />} />
                     <Route path="/domestic-transfer" element={<DomesticTransferPage />} />
                     <Route path="/bill-payment" element={<BillPaymentPage />} />

@@ -1133,6 +1133,207 @@ async def get_l2l_documents(payload: dict = Depends(verify_token)):
         doc["created_at"] = doc["created_at"].isoformat()
     return doc
 
+# ================ SMTP EMAIL SYSTEM ================
+
+class EmailRequest(BaseModel):
+    to_email: str
+    to_name: str = ""
+    subject: str = ""
+    template: str = "custom"
+    body: str = ""
+    transfer_ref: str = ""
+
+@api_router.post("/emails/send")
+async def send_email(req: EmailRequest, payload: dict = Depends(verify_token)):
+    now = datetime.now(timezone.utc)
+    email_id = str(uuid.uuid4())
+    msg_id = f"<{uuid.uuid4().hex[:16]}@finance-ubs.com>"
+
+    # Build email body based on template
+    if req.template == "l2l_confirmation":
+        last_l2l = await db.l2l_receipts.find_one({}, {"_id": 0}, sort=[("created_at", -1)])
+        if not last_l2l:
+            raise HTTPException(status_code=404, detail="No L2L transfer found for email")
+        nr = last_l2l.get("nostro_routing", {})
+        email_body = f"""UNION BANK OF SWITZERLAND AG
+SWIFT FIN TRADE OPERATIONS
+Bahnhofstrasse 45, CH-8001 Zurich, Switzerland
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LEDGER TO LEDGER — TRANSFER CONFIRMATION
+
+Dear {req.to_name or req.to_email},
+
+We hereby confirm that the following Ledger to Ledger fund transfer
+has been executed and completed successfully.
+
+━━━━━━━━━━━━━ TRANSACTION DETAILS ━━━━━━━━━━━━━
+
+Reference Number    : {last_l2l.get('codes',{}).get('ref_num','')}
+Transaction ID      : {last_l2l.get('codes',{}).get('tx_id','')}
+Transfer Amount     : {last_l2l.get('amount','')}
+Value Date          : {last_l2l.get('delivery_datetime','')}
+
+━━━━━━━━━━━━━ ORIGINATOR ━━━━━━━━━━━━━━━━━━━━━
+
+Name                : {last_l2l.get('sender',{}).get('name','')}
+Company             : {last_l2l.get('sender',{}).get('company','')}
+Account             : {last_l2l.get('sender',{}).get('account','')}
+IBAN                : {last_l2l.get('sender',{}).get('iban','')}
+SWIFT               : {last_l2l.get('sender',{}).get('swift','')}
+
+━━━━━━━━━━━━━ BENEFICIARY ━━━━━━━━━━━━━━━━━━━━
+
+Name                : {last_l2l.get('receiver',{}).get('name','')}
+Account             : {last_l2l.get('receiver',{}).get('account','')}
+Bank                : {last_l2l.get('receiver',{}).get('bank_name','')}
+SWIFT               : {last_l2l.get('receiver',{}).get('swift','')}
+Address             : {last_l2l.get('receiver',{}).get('bank_address','')}
+
+━━━━━━━━━━━━━ NOSTRO ROUTING ━━━━━━━━━━━━━━━━━
+
+Nostro Bank         : {nr.get('nostro_bank','')}
+Nostro SWIFT        : {nr.get('nostro_swift','')}
+Nostro IBAN         : {nr.get('nostro_iban','')}
+Routing Path        : UBSWCHZHXXX → ECBFDEFFXXX → CCFRFRPP → HSBCHKHHHKH
+Remittance          : {nr.get('remittance_info','')}
+
+━━━━━━━━━━━━━ VALIDATION STATUS ━━━━━━━━━━━━━━
+
+Step 1: UBS AG SWIFT POOL (UBSWCHZHXXX)         — COMPLETED ✓
+Step 2: ECB VALIDATION (ECBFDEFFXXX)             — COMPLETED ✓
+Step 3: NOSTRO HSBC CONT. EUROPE (CCFRFRPP)      — COMPLETED ✓
+Step 4: HSBC HK SWIFT POOL (HSBCHKHHHKH)        — COMPLETED ✓
+Step 5: BENEFICIARY CREDITED                      — COMPLETED ✓
+
+━━━━━━━━━━━━━ CODES ━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Identity Code       : {last_l2l.get('codes',{}).get('identity_code','')}
+Deposit Code        : {last_l2l.get('codes',{}).get('deposit_code','')}
+Activation Code     : {last_l2l.get('codes',{}).get('activation_code','')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This is an automated confirmation from UBS SWIFT FIN Trade Operations.
+For inquiries, contact: swiftfintrade@ubs.com
+
+UNION BANK OF SWITZERLAND AG
+www.ubs.com | SWIFT: UBSWCHZHXXX"""
+        email_subject = f"UBS L2L Transfer Confirmation — {last_l2l.get('codes',{}).get('ref_num','')} — {last_l2l.get('amount','')}"
+
+    elif req.template == "transfer_notification":
+        last_l2l = await db.l2l_receipts.find_one({}, {"_id": 0}, sort=[("created_at", -1)])
+        amt = last_l2l.get('amount', '') if last_l2l else ''
+        ref = last_l2l.get('codes', {}).get('ref_num', '') if last_l2l else ''
+        rcv = last_l2l.get('receiver', {}).get('name', '') if last_l2l else ''
+        email_body = f"""UNION BANK OF SWITZERLAND AG
+SWIFT FIN TRADE OPERATIONS — NOTIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TRANSFER NOTIFICATION
+
+Dear {req.to_name or req.to_email},
+
+This is to notify you that a fund transfer has been processed:
+
+Amount          : {amt}
+Reference       : {ref}
+Beneficiary     : {rcv}
+Status          : COMPLETED — BENEFICIARY CREDITED
+Channel         : SWIFT FIN LEDGER TO LEDGER
+Date            : {last_l2l.get('delivery_datetime','') if last_l2l else ''}
+
+All compliance checks (AML/KYC/FATF) have been cleared.
+No further action is required.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+UNION BANK OF SWITZERLAND AG
+swiftfintrade@ubs.com | SWIFT: UBSWCHZHXXX"""
+        email_subject = f"UBS Transfer Notification — {ref}"
+
+    elif req.template == "bank_officer":
+        email_body = f"""UNION BANK OF SWITZERLAND AG
+CONFIDENTIAL — BANK OFFICER COMMUNICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TO      : {req.to_name or req.to_email}
+FROM    : SWIFT FIN TRADE OPERATIONS — UBS AG
+CHANNEL : SECURE EMAIL / SWIFT Y-COPY
+DATE    : {now.strftime('%Y-%m-%d %H:%M:%S')} UTC
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{req.body}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This message is sent via UBS Secure SMTP Channel.
+For verification: swiftfintrade@ubs.com
+UNION BANK OF SWITZERLAND AG | Bahnhofstrasse 45, CH-8001 Zurich"""
+        email_subject = req.subject or "UBS AG — Bank Officer Communication"
+
+    else:
+        email_body = req.body or "No content"
+        email_subject = req.subject or "UBS AG Communication"
+
+    # SMTP transmission simulation
+    smtp_log = {
+        "connection": f"Connecting to smtp.finance-ubs.com:587 (TLS)...",
+        "tls": "TLS 1.3 handshake complete — ECDHE-RSA-AES256-GCM-SHA384",
+        "auth": "AUTH LOGIN swiftfintrade@ubs.com — 235 Authentication successful",
+        "mail_from": f"MAIL FROM:<swiftfintrade@ubs.com> — 250 OK",
+        "rcpt_to": f"RCPT TO:<{req.to_email}> — 250 OK",
+        "data": "DATA — 354 Start mail input",
+        "sent": f"250 OK id={email_id[:12]}",
+        "quit": "QUIT — 221 Bye",
+    }
+
+    email_record = {
+        "id": email_id,
+        "message_id": msg_id,
+        "from_email": "swiftfintrade@ubs.com",
+        "from_name": "UBS SWIFT FIN Trade Operations",
+        "to_email": req.to_email,
+        "to_name": req.to_name,
+        "subject": email_subject,
+        "body": email_body,
+        "template": req.template,
+        "transfer_ref": req.transfer_ref,
+        "status": "delivered",
+        "smtp_log": smtp_log,
+        "smtp_host": "smtp.finance-ubs.com",
+        "smtp_port": 587,
+        "headers": {
+            "Message-ID": msg_id,
+            "From": "UBS SWIFT FIN Trade Operations <swiftfintrade@ubs.com>",
+            "To": f"{req.to_name} <{req.to_email}>" if req.to_name else req.to_email,
+            "Subject": email_subject,
+            "Date": now.strftime("%a, %d %b %Y %H:%M:%S +0000"),
+            "MIME-Version": "1.0",
+            "Content-Type": "text/plain; charset=UTF-8",
+            "X-Mailer": "UBS-SWIFT-FIN/4.2",
+            "X-Priority": "1 (Highest)",
+            "X-UBS-Ref": req.transfer_ref or "N/A",
+            "Return-Path": "swiftfintrade@ubs.com",
+            "DKIM-Signature": f"v=1; a=rsa-sha256; d=finance-ubs.com; s=ubs2024; h=from:to:subject:date; b={uuid.uuid4().hex[:40]}",
+        },
+        "created_at": now,
+    }
+
+    await db.sent_emails.insert_one(email_record)
+    email_record.pop("_id", None)
+    email_record["created_at"] = now.isoformat()
+    return email_record
+
+@api_router.get("/emails")
+async def get_sent_emails(payload: dict = Depends(verify_token)):
+    emails = []
+    cursor = db.sent_emails.find({}, {"_id": 0}).sort("created_at", -1).limit(50)
+    async for doc in cursor:
+        if "created_at" in doc and hasattr(doc["created_at"], "isoformat"):
+            doc["created_at"] = doc["created_at"].isoformat()
+        emails.append(doc)
+    return emails
+
 # ================ CIS (Customer Information Sheet) ================
 
 @api_router.get("/cis")
