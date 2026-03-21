@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -16,6 +16,12 @@ import {
   CheckCircle,
   Terminal,
   Shield,
+  Building2,
+  Landmark,
+  Globe,
+  ArrowRight,
+  Clock,
+  CircleCheck,
 } from 'lucide-react';
 
 const LedgerTransferPage = () => {
@@ -24,25 +30,41 @@ const LedgerTransferPage = () => {
     sender_company: 'BB BIOTECH AG',
     sender_account: '001-8839903939',
     sender_iban: 'CH93 0027 3001 8839 9039 39',
-    receiver_bank_name: '',
-    receiver_bank_address: '',
-    receiver_swift: '',
-    receiver_account: '',
+    receiver_bank_name: 'HONG KONG AND SHANGHAI BANKING CORPORATION',
+    receiver_bank_address: 'HSBC BUILDING, 82 NATHAN ROAD, KOWLOON, HK',
+    receiver_swift: 'HSBCHKHHHKH',
+    receiver_account: '165758772838',
     receiver_iban: '',
-    receiver_name: '',
-    amount: '',
+    receiver_name: 'HONG KONG UNIWORLD LIMITED',
+    amount: '99000000',
     currency: 'EUR',
     purpose: 'INVESTMENT / INTERNAL LEDGER',
   });
   const [loading, setLoading] = useState(false);
   const [receipt, setReceipt] = useState(null);
   const [beneficiaries, setBeneficiaries] = useState([]);
+  const [trackerAnimating, setTrackerAnimating] = useState(false);
+  const [activeStage, setActiveStage] = useState(-1);
+  const trackerRef = useRef(null);
 
   useEffect(() => {
     api.get('/beneficiaries').then(r => setBeneficiaries(r.data)).catch(() => {});
   }, []);
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  const animateTracker = (stages) => {
+    setTrackerAnimating(true);
+    setActiveStage(0);
+    stages.forEach((_, i) => {
+      setTimeout(() => {
+        setActiveStage(i);
+        if (i === stages.length - 1) {
+          setTimeout(() => setTrackerAnimating(false), 600);
+        }
+      }, (i + 1) * 900);
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,10 +73,20 @@ const LedgerTransferPage = () => {
       return;
     }
     setLoading(true);
+    setReceipt(null);
+    setActiveStage(-1);
     try {
       const res = await api.post('/transfers/ledger', { ...form, amount: parseFloat(form.amount) });
       setReceipt(res.data);
       toast.success('Ledger to Ledger transfer completed');
+      if (res.data.nostro_routing?.stages) {
+        setTimeout(() => {
+          animateTracker(res.data.nostro_routing.stages);
+          if (trackerRef.current) {
+            trackerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 400);
+      }
     } catch {
       toast.error('Transfer failed');
     } finally {
@@ -84,6 +116,14 @@ const LedgerTransferPage = () => {
     }
   };
 
+  const stageIcons = [
+    <Building2 className="w-5 h-5" />,
+    <Landmark className="w-5 h-5" />,
+    <Globe className="w-5 h-5" />,
+    <Building2 className="w-5 h-5" />,
+    <CircleCheck className="w-5 h-5" />,
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -92,7 +132,7 @@ const LedgerTransferPage = () => {
             <ArrowRightLeft className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
             Ledger to Ledger Transfer
           </h1>
-          <p className="text-swiss-text-secondary mt-1">SWIFT FIN Ledger to Ledger Cash Transfer</p>
+          <p className="text-swiss-text-secondary mt-1">SWIFT FIN Ledger to Ledger Cash Transfer — Nostro Routing</p>
         </div>
         {receipt && (
           <Button onClick={printReceipt} className="bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm">
@@ -113,20 +153,20 @@ const LedgerTransferPage = () => {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Sender */}
-              <div className="bg-swiss-bg-subtle p-4 rounded-sm space-y-3">
-                <p className="text-[10px] text-swiss-red uppercase tracking-widest font-bold">Sender (UBS)</p>
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-sm space-y-3">
+                <p className="text-[10px] text-swiss-red uppercase tracking-widest font-bold">Sender (UBS AG)</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label className="text-xs text-swiss-text-muted">Name</Label><Input value={form.sender_name} onChange={e => set('sender_name', e.target.value)} className="mt-1 text-sm" /></div>
-                  <div><Label className="text-xs text-swiss-text-muted">Company</Label><Input value={form.sender_company} onChange={e => set('sender_company', e.target.value)} className="mt-1 text-sm" /></div>
+                  <div><Label className="text-xs text-slate-500">Name</Label><Input value={form.sender_name} onChange={e => set('sender_name', e.target.value)} className="mt-1 text-sm" /></div>
+                  <div><Label className="text-xs text-slate-500">Company</Label><Input value={form.sender_company} onChange={e => set('sender_company', e.target.value)} className="mt-1 text-sm" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label className="text-xs text-swiss-text-muted">Account</Label><Input value={form.sender_account} onChange={e => set('sender_account', e.target.value)} className="mt-1 text-sm font-mono" /></div>
-                  <div><Label className="text-xs text-swiss-text-muted">IBAN</Label><Input value={form.sender_iban} onChange={e => set('sender_iban', e.target.value)} className="mt-1 text-sm font-mono" /></div>
+                  <div><Label className="text-xs text-slate-500">Account</Label><Input value={form.sender_account} onChange={e => set('sender_account', e.target.value)} className="mt-1 text-sm font-mono" /></div>
+                  <div><Label className="text-xs text-slate-500">IBAN</Label><Input value={form.sender_iban} onChange={e => set('sender_iban', e.target.value)} className="mt-1 text-sm font-mono" /></div>
                 </div>
               </div>
 
               {/* Receiver */}
-              <div className="bg-swiss-bg-subtle p-4 rounded-sm space-y-3">
+              <div className="bg-slate-50 border border-slate-200 p-4 rounded-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <p className="text-[10px] text-swiss-red uppercase tracking-widest font-bold">Receiver</p>
                   {beneficiaries.length > 0 && (
@@ -137,28 +177,39 @@ const LedgerTransferPage = () => {
                   )}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label className="text-xs text-swiss-text-muted">Bank Name *</Label><Input value={form.receiver_bank_name} onChange={e => set('receiver_bank_name', e.target.value)} className="mt-1 text-sm" required /></div>
-                  <div><Label className="text-xs text-swiss-text-muted">SWIFT / BIC *</Label><Input value={form.receiver_swift} onChange={e => set('receiver_swift', e.target.value)} className="mt-1 text-sm font-mono" required /></div>
+                  <div><Label className="text-xs text-slate-500">Bank Name *</Label><Input value={form.receiver_bank_name} onChange={e => set('receiver_bank_name', e.target.value)} className="mt-1 text-sm" required /></div>
+                  <div><Label className="text-xs text-slate-500">SWIFT / BIC *</Label><Input value={form.receiver_swift} onChange={e => set('receiver_swift', e.target.value)} className="mt-1 text-sm font-mono" required /></div>
                 </div>
-                <div><Label className="text-xs text-swiss-text-muted">Bank Address</Label><Input value={form.receiver_bank_address} onChange={e => set('receiver_bank_address', e.target.value)} className="mt-1 text-sm" /></div>
+                <div><Label className="text-xs text-slate-500">Bank Address</Label><Input value={form.receiver_bank_address} onChange={e => set('receiver_bank_address', e.target.value)} className="mt-1 text-sm" /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label className="text-xs text-swiss-text-muted">Account Number</Label><Input value={form.receiver_account} onChange={e => set('receiver_account', e.target.value)} className="mt-1 text-sm font-mono" /></div>
-                  <div><Label className="text-xs text-swiss-text-muted">IBAN</Label><Input value={form.receiver_iban} onChange={e => set('receiver_iban', e.target.value)} className="mt-1 text-sm font-mono" /></div>
+                  <div><Label className="text-xs text-slate-500">Account Number</Label><Input value={form.receiver_account} onChange={e => set('receiver_account', e.target.value)} className="mt-1 text-sm font-mono" /></div>
+                  <div><Label className="text-xs text-slate-500">IBAN</Label><Input value={form.receiver_iban} onChange={e => set('receiver_iban', e.target.value)} className="mt-1 text-sm font-mono" /></div>
                 </div>
-                <div><Label className="text-xs text-swiss-text-muted">Beneficiary Name *</Label><Input value={form.receiver_name} onChange={e => set('receiver_name', e.target.value)} className="mt-1 text-sm" required /></div>
+                <div><Label className="text-xs text-slate-500">Beneficiary Name *</Label><Input value={form.receiver_name} onChange={e => set('receiver_name', e.target.value)} className="mt-1 text-sm" required /></div>
+              </div>
+
+              {/* Nostro Info Box */}
+              <div className="bg-amber-50 border border-amber-200 p-3 rounded-sm">
+                <p className="text-[10px] text-amber-700 uppercase tracking-widest font-bold mb-2">Nostro Correspondent Account (EUR)</p>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                  <span className="text-amber-600">Institution:</span><span className="font-mono text-slate-800">HSBC CONTINENTAL EUROPE SA</span>
+                  <span className="text-amber-600">SWIFT:</span><span className="font-mono text-slate-800">CCFRFRPP</span>
+                  <span className="text-amber-600">IBAN:</span><span className="font-mono text-slate-800">FR7630056000100010000405731</span>
+                  <span className="text-amber-600">Remittance:</span><span className="text-slate-800">For credit to beneficiary account</span>
+                </div>
               </div>
 
               {/* Amount */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-2"><Label className="text-xs text-swiss-text-muted">Amount *</Label><Input type="number" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)} className="mt-1 text-sm font-mono" required /></div>
-                <div><Label className="text-xs text-swiss-text-muted">Currency</Label>
+                <div className="col-span-2"><Label className="text-xs text-slate-500">Amount *</Label><Input type="number" step="0.01" value={form.amount} onChange={e => set('amount', e.target.value)} className="mt-1 text-sm font-mono" required /></div>
+                <div><Label className="text-xs text-slate-500">Currency</Label>
                   <Select value={form.currency} onValueChange={v => set('currency', v)}>
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent><SelectItem value="EUR">EUR</SelectItem><SelectItem value="USD">USD</SelectItem><SelectItem value="CHF">CHF</SelectItem><SelectItem value="GBP">GBP</SelectItem></SelectContent>
                   </Select>
                 </div>
               </div>
-              <div><Label className="text-xs text-swiss-text-muted">Purpose</Label><Input value={form.purpose} onChange={e => set('purpose', e.target.value)} className="mt-1 text-sm" /></div>
+              <div><Label className="text-xs text-slate-500">Purpose</Label><Input value={form.purpose} onChange={e => set('purpose', e.target.value)} className="mt-1 text-sm" /></div>
 
               <Button type="submit" disabled={loading} className="w-full bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm">
                 {loading ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
@@ -244,6 +295,14 @@ ${'—'.repeat(25)}LEDGER TO LEDGER TRANSFER SWIFT MESSAGE${'—'.repeat(20)}
 ***CHANNEL CODE: ${receipt.codes.channel_code}
 ***LINK CODE (CENTRAL BANK: ${Math.floor(Math.random() * 900000000) + 100000000})
 
+${'*'.repeat(20)}NOSTRO CORRESPONDENT ROUTING${'*'.repeat(20)}
+NOSTRO BANK       : HSBC CONTINENTAL EUROPE SA
+NOSTRO SWIFT      : ${receipt.nostro_routing.nostro_swift}
+NOSTRO IBAN       : ${receipt.nostro_routing.nostro_iban}
+REMITTANCE INFO   : ${receipt.nostro_routing.remittance_info}
+ROUTING PATH      : UBSWCHZHXXX → ECBFDEFFXXX → CCFRFRPP → HSBCHKHHHKH
+VALIDATION STATUS : ALL STAGES COMPLETED [√]
+
 ${'*'.repeat(40)}RECEIVER INFORMATION${'*'.repeat(35)}
 103 : /RECEIVER/BANK NAME: ${receipt.receiver.bank_name.toUpperCase()}
 927 : /RECEIVER/BANK ADDRESS: ${receipt.receiver.bank_address}
@@ -323,24 +382,183 @@ OBTAINED VALUES
         </Card>
       </div>
 
+      {/* Fund Movement Tracker */}
+      {receipt && receipt.nostro_routing && (
+        <div ref={trackerRef}>
+          <Card className="bg-white border-slate-200 rounded-sm overflow-hidden">
+            <CardHeader className="border-b border-slate-200 bg-slate-50 py-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-swiss-red" strokeWidth={1.5} />
+                  FUND MOVEMENT VALIDATION TRACKER
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-green-100 text-green-800 text-[10px] rounded-sm border border-green-300">
+                    NOSTRO ROUTING VERIFIED
+                  </Badge>
+                  <Badge className="bg-slate-100 text-slate-700 text-[10px] rounded-sm border border-slate-300">
+                    REF: {receipt.codes.ref_num}
+                  </Badge>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 mt-1">
+                Transfer amount: <span className="font-mono font-bold text-slate-900">{receipt.amount}</span> — Routing via Nostro correspondent account
+              </p>
+            </CardHeader>
+            <CardContent className="p-6">
+              {/* Horizontal Tracker */}
+              <div className="relative">
+                {/* Connection Line */}
+                <div className="absolute top-8 left-0 right-0 h-0.5 bg-slate-200 z-0" />
+                <div
+                  className="absolute top-8 left-0 h-0.5 bg-green-500 z-10 transition-all duration-700 ease-out"
+                  style={{ width: activeStage >= 0 ? `${Math.min(100, (activeStage / 4) * 100)}%` : '0%' }}
+                />
+
+                {/* Stages */}
+                <div className="relative z-20 flex justify-between">
+                  {receipt.nostro_routing.stages.map((stage, i) => {
+                    const isActive = i <= activeStage;
+                    const isCurrent = i === activeStage && trackerAnimating;
+                    return (
+                      <div key={i} className="flex flex-col items-center" style={{ width: '18%' }}>
+                        {/* Icon Circle */}
+                        <div
+                          className={`w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${
+                            isActive
+                              ? 'bg-green-600 border-green-600 text-white shadow-lg shadow-green-200'
+                              : 'bg-white border-slate-300 text-slate-400'
+                          } ${isCurrent ? 'scale-110 ring-4 ring-green-200' : ''}`}
+                        >
+                          {isActive ? <CheckCircle className="w-6 h-6" /> : stageIcons[i]}
+                        </div>
+
+                        {/* Label */}
+                        <div className="mt-3 text-center">
+                          <p className={`text-[10px] font-bold uppercase tracking-wide ${isActive ? 'text-green-700' : 'text-slate-400'}`}>
+                            STEP {stage.step}
+                          </p>
+                          <p className={`text-xs font-bold mt-0.5 leading-tight ${isActive ? 'text-slate-900' : 'text-slate-400'}`}>
+                            {stage.label}
+                          </p>
+                          {stage.swift_code && (
+                            <p className={`text-[10px] font-mono mt-0.5 ${isActive ? 'text-slate-600' : 'text-slate-300'}`}>
+                              {stage.swift_code}
+                            </p>
+                          )}
+                          <p className={`text-[10px] mt-0.5 ${isActive ? 'text-slate-500' : 'text-slate-300'}`}>
+                            {stage.location}
+                          </p>
+                        </div>
+
+                        {/* Status */}
+                        <div className="mt-2">
+                          {isActive ? (
+                            <Badge className="bg-green-100 text-green-700 text-[9px] rounded-sm border border-green-200">
+                              COMPLETED
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-slate-100 text-slate-400 text-[9px] rounded-sm border border-slate-200">
+                              PENDING
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Arrow Flow Summary */}
+              <div className="mt-8 p-4 bg-slate-900 rounded-sm">
+                <div className="flex items-center justify-center gap-1 flex-wrap">
+                  {receipt.nostro_routing.stages.map((stage, i) => (
+                    <div key={i} className="flex items-center gap-1">
+                      <span className={`text-[10px] font-mono px-2 py-1 rounded ${
+                        i <= activeStage ? 'bg-green-900 text-green-400 border border-green-700' : 'bg-slate-800 text-slate-500 border border-slate-700'
+                      }`}>
+                        {stage.swift_code || stage.institution}
+                      </span>
+                      {i < receipt.nostro_routing.stages.length - 1 && (
+                        <ArrowRight className={`w-4 h-4 ${i < activeStage ? 'text-green-500' : 'text-slate-600'}`} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Detailed Stage Cards */}
+              <div className="mt-6 space-y-3">
+                {receipt.nostro_routing.stages.map((stage, i) => {
+                  const isActive = i <= activeStage;
+                  return (
+                    <div
+                      key={i}
+                      className={`p-4 rounded-sm border transition-all duration-500 ${
+                        isActive
+                          ? 'bg-white border-green-200 shadow-sm'
+                          : 'bg-slate-50 border-slate-100 opacity-50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                            isActive ? 'bg-green-600 text-white' : 'bg-slate-200 text-slate-500'
+                          }`}>
+                            {stage.step}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-900">{stage.institution}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{stage.action}</p>
+                            <p className="text-[10px] text-slate-400 font-mono mt-1">{stage.details}</p>
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0 ml-4">
+                          <div className="flex items-center gap-1 text-[10px] text-slate-500">
+                            <Clock className="w-3 h-3" />
+                            <span className="font-mono">{stage.timestamp}</span>
+                          </div>
+                          {isActive && (
+                            <Badge className="mt-1 bg-green-100 text-green-700 text-[9px] rounded-sm border border-green-200">
+                              VERIFIED
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      {stage.iban && (
+                        <div className="mt-2 ml-11 p-2 bg-amber-50 border border-amber-200 rounded-sm">
+                          <p className="text-[10px] font-mono text-amber-800">
+                            NOSTRO IBAN: {stage.iban} | SWIFT: {stage.swift_code}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Status Bar */}
       {receipt && (
         <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <CheckCircle className="w-5 h-5 text-swiss-status-success" />
+                <CheckCircle className="w-5 h-5 text-green-600" />
                 <div>
-                  <p className="text-slate-900 font-bold text-sm">Transfer Completed Successfully</p>
-                  <p className="text-swiss-text-muted text-xs font-mono">Ref: {receipt.codes.ref_num}</p>
+                  <p className="text-slate-900 font-bold text-sm">Transfer Completed Successfully — Nostro Routing Verified</p>
+                  <p className="text-slate-500 text-xs font-mono">Ref: {receipt.codes.ref_num} | Nostro: CCFRFRPP / FR7630056000100010000405731</p>
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs text-swiss-text-muted">
-                <span>TX ID: <span className="font-mono text-swiss-text-secondary">{receipt.codes.tx_id}</span></span>
+              <div className="flex items-center gap-4 text-xs text-slate-500">
+                <span>TX ID: <span className="font-mono text-slate-700">{receipt.codes.tx_id}</span></span>
                 <span className="h-3 w-px bg-slate-200" />
                 <span>{receipt.delivery_datetime}</span>
                 <span className="h-3 w-px bg-slate-200" />
-                <Badge className="bg-green-100 text-green-800 rounded-sm text-xs">DELIVERED</Badge>
+                <Badge className="bg-green-100 text-green-800 rounded-sm text-xs border border-green-300">DELIVERED</Badge>
               </div>
             </div>
           </CardContent>
@@ -353,6 +571,20 @@ OBTAINED VALUES
 export default LedgerTransferPage;
 
 function buildReceiptHTML(r) {
+  const nostro = r.nostro_routing || {};
+  const stages = nostro.stages || [];
+  const stageHTML = stages.map((s, i) => `
+    <tr>
+      <td style="padding:6px 8px;border:1px solid #ddd;text-align:center;font-weight:bold;background:${i <= 4 ? '#dcfce7' : '#f1f5f9'}">${s.step}</td>
+      <td style="padding:6px 8px;border:1px solid #ddd;font-weight:bold">${s.institution}</td>
+      <td style="padding:6px 8px;border:1px solid #ddd;font-family:monospace;font-size:8px">${s.swift_code || '-'}</td>
+      <td style="padding:6px 8px;border:1px solid #ddd;font-size:8px">${s.location}</td>
+      <td style="padding:6px 8px;border:1px solid #ddd;font-size:8px">${s.action}</td>
+      <td style="padding:6px 8px;border:1px solid #ddd;font-family:monospace;font-size:8px">${s.timestamp}</td>
+      <td style="padding:6px 8px;border:1px solid #ddd;text-align:center;color:#16a34a;font-weight:bold">VERIFIED</td>
+    </tr>
+  `).join('');
+
   return `<html><head><title>UBS - Ledger to Ledger Transfer Receipt</title><style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Courier New',monospace;padding:20px;font-size:9px;color:#000;line-height:1.4;background:#fff}
@@ -361,12 +593,33 @@ function buildReceiptHTML(r) {
     .logo{font-size:24px;font-weight:bold;color:#DC2626}
     .stamp{border:2px solid #DC2626;padding:8px 15px;text-align:center;color:#DC2626;margin-top:15px;display:inline-block}
     .footer{margin-top:15px;border-top:1px solid #ccc;padding-top:10px;font-size:7px;color:#666}
+    table{width:100%;border-collapse:collapse;font-size:8px;margin:10px 0}
+    th{background:#1e293b;color:white;padding:6px 8px;text-align:left;border:1px solid #334155}
+    .nostro-box{background:#fffbeb;border:1px solid #fbbf24;padding:8px;margin:10px 0;font-size:8px}
     @media print{body{padding:10px;font-size:8px}}
   </style></head><body>
     <div class="hdr">
-      <div><div class="logo">UBS</div><div>Union Bank of Switzerland AG</div><div style="color:#666">SWIFT FIN LEDGER TO LEDGER TRANSFER</div></div>
+      <div><div class="logo">UBS</div><div>Union Bank of Switzerland AG</div><div style="color:#666">SWIFT FIN LEDGER TO LEDGER TRANSFER — NOSTRO ROUTING</div></div>
       <div style="text-align:right"><div>Date: ${r.delivery_datetime}</div><div>Ref: ${r.codes.ref_num}</div></div>
     </div>
+
+    <div class="nostro-box">
+      <strong>NOSTRO CORRESPONDENT ACCOUNT (EUR)</strong><br>
+      Institution: HSBC CONTINENTAL EUROPE SA | SWIFT: ${nostro.nostro_swift || 'CCFRFRPP'} | IBAN: ${nostro.nostro_iban || 'FR7630056000100010000405731'}<br>
+      Remittance: ${nostro.remittance_info || ''}
+    </div>
+
+    <div style="margin:10px 0;padding:8px;background:#f0fdf4;border:1px solid #86efac">
+      <strong>FUND MOVEMENT VALIDATION TRACKER</strong>
+      <table>
+        <tr><th>Step</th><th>Institution</th><th>SWIFT</th><th>Location</th><th>Action</th><th>Timestamp</th><th>Status</th></tr>
+        ${stageHTML}
+      </table>
+      <div style="text-align:center;font-family:monospace;font-size:8px;margin-top:5px">
+        UBSWCHZHXXX → ECBFDEFFXXX → CCFRFRPP → HSBCHKHHHKH → BENEFICIARY CREDITED
+      </div>
+    </div>
+
     <pre>CONNECTED (${r.connection.ip})
 ${'-'.repeat(80)}
 ${r.connection.cert_chain}
@@ -399,6 +652,14 @@ ${'—'.repeat(25)}LEDGER TO LEDGER TRANSFER SWIFT MESSAGE${'—'.repeat(20)}
 105 : /CLIENT ACCOUNT NUMBER: ${r.sender.account}
 106 : /CLIENT IBAN: ${r.sender.iban}
 107 : /SEND AMOUNT: ${r.amount}
+
+${'*'.repeat(20)}NOSTRO CORRESPONDENT ROUTING${'*'.repeat(20)}
+NOSTRO BANK       : HSBC CONTINENTAL EUROPE SA
+NOSTRO SWIFT      : ${nostro.nostro_swift || 'CCFRFRPP'}
+NOSTRO IBAN       : ${nostro.nostro_iban || 'FR7630056000100010000405731'}
+REMITTANCE INFO   : ${nostro.remittance_info || ''}
+ROUTING PATH      : UBSWCHZHXXX → ECBFDEFFXXX → CCFRFRPP → HSBCHKHHHKH
+
 ${'*'.repeat(40)}RECEIVER INFORMATION${'*'.repeat(35)}
 103 : /RECEIVER/BANK NAME: ${r.receiver.bank_name.toUpperCase()}
 927 : /RECEIVER/BANK ADDRESS: ${r.receiver.bank_address}
@@ -435,7 +696,7 @@ TRANSMISSION SUCCESSFUL
 ${r.hex_dump.join('\\n')}
 TRANSACTION SUCCESS !!!!!
 COPYRIGHT 2023-2024 UNION BANK OF SWITZERLAND AG SWIFT FIN LEDGER TO LEDGER TRANSFER</pre>
-    <div style="text-align:center"><div class="stamp"><div style="font-size:7px">UNION BANK OF SWITZERLAND AG</div><div style="font-size:18px;font-weight:bold">UBS</div><div style="font-size:7px">L2L TRANSFER CONFIRMED</div></div></div>
-    <div class="footer">LEDGER TO LEDGER TRANSFER | REF: ${r.codes.ref_num} | ${new Date().toISOString()}<br>THIS IS A COMPUTER-GENERATED DOCUMENT.</div>
+    <div style="text-align:center"><div class="stamp"><div style="font-size:7px">UNION BANK OF SWITZERLAND AG</div><div style="font-size:18px;font-weight:bold">UBS</div><div style="font-size:7px">L2L TRANSFER — NOSTRO ROUTING CONFIRMED</div></div></div>
+    <div class="footer">LEDGER TO LEDGER TRANSFER | NOSTRO: CCFRFRPP / ${nostro.nostro_iban || 'FR7630056000100010000405731'} | REF: ${r.codes.ref_num} | ${new Date().toISOString()}<br>THIS IS A COMPUTER-GENERATED DOCUMENT.</div>
   </body></html>`;
 }

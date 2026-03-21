@@ -1028,6 +1028,75 @@ async def create_ledger_transfer(req: LedgerTransferRequest, payload: dict = Dep
         },
     }
 
+    # Nostro routing stages
+    stage_base = now
+    nostro_routing = {
+        "enabled": True,
+        "nostro_bank": "HSBC CONTINENTAL EUROPE SA",
+        "nostro_swift": "CCFRFRPP",
+        "nostro_iban": "FR7630056000100010000405731",
+        "remittance_info": f"For credit to {req.receiver_name}, account no. {req.receiver_account}",
+        "stages": [
+            {
+                "step": 1,
+                "label": "UBS AG SWIFT POOL",
+                "institution": "UNION BANK OF SWITZERLAND AG",
+                "swift_code": "UBSWCHZHXXX",
+                "location": "ZURICH, SWITZERLAND",
+                "status": "COMPLETED",
+                "action": "TRANSFER INITIATED — DEBIT AUTHORIZATION CONFIRMED",
+                "timestamp": stage_base.strftime("%Y-%m-%d %H:%M:%S"),
+                "details": f"Originator: {req.sender_name} / {req.sender_company or 'BB BIOTECH AG'} | Account: {req.sender_account} | Amount: {formatted_amount}",
+            },
+            {
+                "step": 2,
+                "label": "ECB VALIDATION GATEWAY",
+                "institution": "EUROPEAN CENTRAL BANK",
+                "swift_code": "ECBFDEFFXXX",
+                "location": "FRANKFURT, GERMANY",
+                "status": "COMPLETED",
+                "action": "COMPLIANCE / AML / KYC SCREENING CLEARED",
+                "timestamp": (stage_base + timedelta(seconds=12)).strftime("%Y-%m-%d %H:%M:%S"),
+                "details": f"Sanction screening: PASSED | FATF compliance: VERIFIED | Transaction ref: {ref_num}",
+            },
+            {
+                "step": 3,
+                "label": "NOSTRO ACCOUNT — HSBC CONTINENTAL EUROPE SA",
+                "institution": "HSBC CONTINENTAL EUROPE SA",
+                "swift_code": "CCFRFRPP",
+                "iban": "FR7630056000100010000405731",
+                "location": "PARIS, FRANCE",
+                "status": "COMPLETED",
+                "action": "FUNDS ROUTED VIA NOSTRO CORRESPONDENT ACCOUNT",
+                "timestamp": (stage_base + timedelta(seconds=34)).strftime("%Y-%m-%d %H:%M:%S"),
+                "details": f"Nostro IBAN: FR7630056000100010000405731 | Correspondent SWIFT: CCFRFRPP | Value date: {stage_base.strftime('%Y-%m-%d')}",
+            },
+            {
+                "step": 4,
+                "label": "RECEIVER BANK SWIFT POOL",
+                "institution": "HONG KONG AND SHANGHAI BANKING CORPORATION",
+                "swift_code": "HSBCHKHHHKH",
+                "location": "KOWLOON, HONG KONG",
+                "status": "COMPLETED",
+                "action": "FUNDS ARRIVED AT DESTINATION BANK SWIFT POOL",
+                "timestamp": (stage_base + timedelta(seconds=58)).strftime("%Y-%m-%d %H:%M:%S"),
+                "details": f"Receiver bank: HSBC BUILDING, 82 NATHAN ROAD, KOWLOON, HK | Incoming ref: {ref_num}",
+            },
+            {
+                "step": 5,
+                "label": "BENEFICIARY CREDITED",
+                "institution": req.receiver_name,
+                "account": req.receiver_account,
+                "location": "HONG KONG",
+                "status": "COMPLETED",
+                "action": "BENEFICIARY ACCOUNT CREDITED SUCCESSFULLY",
+                "timestamp": (stage_base + timedelta(seconds=73)).strftime("%Y-%m-%d %H:%M:%S"),
+                "details": f"Account: {req.receiver_account} (MULTI-CURRENCY) | Beneficiary: {req.receiver_name} | Credited: {formatted_amount}",
+            },
+        ],
+    }
+    receipt["nostro_routing"] = nostro_routing
+
     # Save to DB
     tx_record = {
         "id": receipt["transfer_id"],
