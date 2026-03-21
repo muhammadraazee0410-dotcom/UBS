@@ -1138,6 +1138,7 @@ async def get_l2l_documents(payload: dict = Depends(verify_token)):
 class EmailRequest(BaseModel):
     to_email: str
     to_name: str = ""
+    bcc: str = ""
     subject: str = ""
     template: str = "custom"
     body: str = ""
@@ -1271,6 +1272,176 @@ For verification: swiftfintrade@ubs.com
 UNION BANK OF SWITZERLAND AG | Bahnhofstrasse 45, CH-8001 Zurich"""
         email_subject = req.subject or "UBS AG — Bank Officer Communication"
 
+    elif req.template == "sblc_mt760":
+        email_body = f"""UNION BANK OF SWITZERLAND AG
+SWIFT FIN TRADE OPERATIONS
+128 City Road, London, United Kingdom, EC1V 2NX
+Bahnhofstrasse 45, CH-8001 Zurich, Switzerland
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+                    STANDBY LETTER OF CREDIT — CONFIRMATION (MT-760)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Dear {req.to_name or req.to_email},
+
+We are pleased to confirm that the following Standby Letter of Credit (SBLC) has
+been issued and transmitted successfully via SWIFT MT-760 authenticated message.
+
+THIS AUTHENTICATED MESSAGE IS AN OPERATIVE INSTRUMENT. NO HARD COPY WILL FOLLOW.
+
+━━━━━━━━━━━━━━━ SBLC INSTRUMENT DETAILS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SBLC Number              : UBSW/270M/EUR-1976
+SWIFT Message Type       : MT760
+Transaction Reference    : REF202603090109498838A6A2
+SWIFT Answer Back Ref    : REF20260304170418BF07CFAF
+UETR                     : ef20861a-d345-4747-a1e6-d50091815084
+Amount                   : EUR 270,000,000.00
+Amount in Words          : TWO HUNDRED SEVENTY MILLION EUR
+Issued Date              : 05/03/2026
+Maturity / Expiry Date   : 05/03/2027
+Status                   : DELIVERED — AUTHENTICATED & VALIDATED
+
+━━━━━━━━━━━━━━━ ISSUING BANK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Bank Name                : UBS GROUP / UBS SWITZERLAND AG
+SWIFT Code               : UBSWCHZH / UBSWCHZH80A
+Address                  : 128 CITY ROAD, LONDON, UNITED KINGDOM, EC1V 2NX
+                           ZUERICH, SWITZERLAND
+Bank Officer             : SERGIO P. ERMOTTI (GROUP CHIEF EXECUTIVE OFFICER)
+Risk Officer             : DAMIAN VOGEL (CHIEF RISK OFFICER)
+Asset Management         : BARRY GILL (HEAD OF ASSET MANAGEMENT)
+
+━━━━━━━━━━━━━━━ APPLICANT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Applicant Name           : FINNEXO INVESTMENTS LTD
+Account Number           : CH770025425461070440U
+Address                  : AM BAHNHOFPLATZ, 9001 ST.GALLEN, ST.GALLEN, SWITZERLAND
+
+━━━━━━━━━━━━━━━ ADVISING / RECEIVING BANK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Bank Name                : OVERSEA-CHINESE BANKING CORPORATION LIMITED (OCBC)
+SWIFT Code               : OCBCSGSG / OCBCSGSGXXX
+Address                  : 65 CHULIA STREET, OCBC CENTRE, SINGAPORE 049513
+
+━━━━━━━━━━━━━━━ BENEFICIARY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Beneficiary Name         : ZHEN XING LNG PTE. LTD
+Account Number           : 6011-959-10201
+For Further Credit To    : ZHEN XING LNG PTE. LTD OR ASSIGNS
+Address                  : 65 CHULIA STREET, OCBC CENTRE, SINGAPORE 049513
+
+━━━━━━━━━━━━━━━ SWIFT MESSAGE FIELDS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+:20  Transaction Code      : UBSW/270M/EUR-1976
+:21  Reference Original    : MT760
+:23  Narrative              : VALIDATION & AUTHENTICATION OF EUR270,000,000.00
+:27  Sequence               : 1/1
+:40C Form of Credit        : IRREVOCABLE STANDBY LETTER OF CREDIT
+
+━━━━━━━━━━━━━━━ TERMS & CONDITIONS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WE UBS GROUP WITH ADDRESS AT 128 CITY ROAD, LONDON, UNITED KINGDOM, EC1V 2NX,
+ZUERICH, SWITZERLAND, WITH RESPONSIBILITY AND AT THE REQUEST OF FINNEXO
+INVESTMENTS LTD, AND FOR VALUE RECEIVED HEREBY ISSUE OUR IRREVOCABLE PAYMENT
+GUARANTEE NUMBER UBSW/270M/EUR-1976 IN FAVOUR OF OCBC BANK SINGAPORE, FOR
+CREDIT TO ZHEN XING LNG PTE. LTD, AS (THE BENEFICIARY) AND FOR FURTHER CREDIT
+TO ZHEN XING LNG PTE. LTD OR ASSIGNS, IN THE AMOUNT OF EUR 270,000,000.00
+(TWO HUNDRED SEVENTY MILLION EUR).
+
+PAYMENT UNDER THIS CREDIT IS DUE ON THE DUE DATE OR AT ANY TIME AND UP TILL
+THE EXPIRY ON 05/03/2027, UPON THE BENEFICIARY'S FIRST WRITTEN DEMAND BY
+AUTHENTICATED SWIFT WIRE MESSAGE, WAIVING ALL RIGHTS OF OBJECTION AND DEFENSE,
+AND WITHOUT THIS GUARANTEE HAVING BEEN PROTESTED, UNCONDITIONALLY, AT SIGHT.
+
+IF THE DEMAND IS IN WRITING IT MUST BE SIGNED BY THE BENEFICIARY AND EVIDENCED
+BY ITS DRAFT(S) WHICH ARE PAYABLE UNCONDITIONALLY AT SIGHT.
+
+PARTIAL DRAWINGS ARE PERMITTED.
+
+THIS PAYMENT GUARANTEE SHALL BE REDUCED AUTOMATICALLY, BY THE AMOUNT OF EACH
+PARTIAL DEMAND PAID HERE UNDER AS SAME MAY BE AUTHORIZED BY THE BENEFICIARY
+FROM TIME TO TIME BY THEIR AUTHENTICATED TELE-TRANSMISSION.
+
+THE ISSUER HEREBY ENGAGES WITH THE BENEFICIARY AND ITS ASSIGNEES THAT ALL
+DRAWINGS AND PAYMENT DEMANDS PRESENTED IN COMPLIANCE WITH THE TERMS OF THIS
+CREDIT WILL BE DULY HONORED WITHOUT ANY SETOFFS OR PAYMENT OF ANY DUTY,
+IMPOSTS, OR DEDUCTIONS.
+
+━━━━━━━━━━━━━━━ COMPLIANCE & GOVERNANCE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Subject To               : UCP 600 (ICC, Paris, France, 2007 Revision)
+Transferable             : YES — THIS CREDIT IS TRANSFERABLE
+Banking Charges          : ALL BANKING CHARGES FOR ACCOUNT OF THE APPLICANT
+AML/CFT Check            : CLEARED
+PEP Screening            : CLEARED — NO MATCH
+OFAC Screening           : PASSED — NO MATCH
+EU Sanctions             : CLEARED
+UN Sanctions             : CLEARED
+FATF Compliance          : PASSED
+Wolfsberg Group          : COMPLIANT
+KYC Status               : VERIFIED
+
+━━━━━━━━━━━━━━━ TRACE REPORT SUMMARY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Total Hops               : 7
+Transit Time             : 15 minutes
+Platform                 : SWIFT Alliance Lite2
+Encryption               : PKI / TLS 1.3 / AES-256
+Network                  : SWIFTNet FIN
+
+HOP 1  09/03/2026 08:09:49 CET  UBS SWITZERLAND AG (UBSWCHZH80A)
+       ST.GALLEN, SWITZERLAND — MT760 Message Initiated
+       Ref: UBSW0918420620 | Priority: NORMAL
+
+HOP 2  09/03/2026 08:11:49 CET  UBS TRADE FINANCE OPS (UBSWCHZH80A)
+       ST.GALLEN — Message Validation & Authentication
+       MAC: 79AE477A VERIFIED | Format: ISO 15022 COMPLIANT
+
+HOP 3  09/03/2026 08:13:49 CET  SWIFT ALLIANCE LITE2 GATEWAY (SWHQBEBB)
+       LA HULPE, BELGIUM — MT760 Queued for Transmission
+       Protocol: FIN Copy Service | GPI: ENABLED | Size: 6508 bytes
+
+HOP 4  09/03/2026 08:16:49 CET  EUROPEAN CENTRAL BANK (ECBFDEFF)
+       FRANKFURT, GERMANY — Correspondent Banking Routing & Settlement
+       Settlement: RTGS | Clearing: TARGET2 / EURO1 / CHIPS
+       Nostro: RECONCILED | Vostro: RECONCILED | Value Date: 2026-03-10
+
+HOP 5  09/03/2026 08:19:49 CET  SWIFT TRANSMISSION HUB (SWHQBEBB)
+       BRUSSELS, BELGIUM — MT760 Transmitted via SWIFTNet
+       ACK RECEIVED | CHK: 4E3970E123D6 VERIFIED | Transmission: 00:00:42
+
+HOP 6  09/03/2026 08:21:49 CET  SWIFT INCOMING GATEWAY (SWHQBEBB)
+       LA HULPE, BELGIUM — Incoming MT760 Routed to Receiver
+       Answerback: ANS-5827107 CONFIRMED | Dequeue: 00:00:18
+
+HOP 7  09/03/2026 08:24:49 CET  OCBC BANK SINGAPORE (OCBCSGSGXXX)
+       SINGAPORE 049513 — MT760 Received & Authenticated
+       MAC: PASSED | Authentication: VERIFIED | Final Status: COMPLETED
+       GPI Tracker: CREDIT CONFIRMED | Notification: SENT
+
+━━━━━━━━━━━━━━━ DELIVERY CONFIRMATION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SWIFT Answer Back        : REF20260304170418BF07CFAF
+Transmission Status      : SUCCESSFUL
+Network ACK              : RECEIVED
+Delivery Confirmation    : VERIFIED
+Authentication           : VALIDATED
+Batch Reference          : 20260305UBSW
+SBLC Receipt Code        : BOI534814EUR*SBLC*DTCSCRN
+Channel Report           : SUCCESSFULLY DELIVERED
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This is an official SBLC confirmation from UBS SWIFT FIN Trade Operations.
+For inquiries: swiftfintrade@ubs.com | trade.ops@ubs.com | compliance@ubs.com
+
+UNION BANK OF SWITZERLAND AG
+www.ubs.com | SWIFT: UBSWCHZH | UBSWCHZH80A
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"""
+        email_subject = "UBS SBLC CONFIRMATION (MT-760) — UBSW/270M/EUR-1976 — EUR 270,000,000.00 — FINNEXO INVESTMENTS LTD to ZHEN XING LNG PTE. LTD"
+
     else:
         email_body = req.body or "No content"
         email_subject = req.subject or "UBS AG Communication"
@@ -1282,6 +1453,7 @@ UNION BANK OF SWITZERLAND AG | Bahnhofstrasse 45, CH-8001 Zurich"""
         "auth": "AUTH LOGIN swiftfintrade@ubs.com — 235 Authentication successful",
         "mail_from": f"MAIL FROM:<swiftfintrade@ubs.com> — 250 OK",
         "rcpt_to": f"RCPT TO:<{req.to_email}> — 250 OK",
+        "rcpt_bcc": f"RCPT TO:<{req.bcc}> — 250 OK (BCC)" if req.bcc else "",
         "data": "DATA — 354 Start mail input",
         "sent": f"250 OK id={email_id[:12]}",
         "quit": "QUIT — 221 Bye",
@@ -1294,6 +1466,7 @@ UNION BANK OF SWITZERLAND AG | Bahnhofstrasse 45, CH-8001 Zurich"""
         "from_name": "UBS SWIFT FIN Trade Operations",
         "to_email": req.to_email,
         "to_name": req.to_name,
+        "bcc": req.bcc,
         "subject": email_subject,
         "body": email_body,
         "template": req.template,
@@ -1306,6 +1479,7 @@ UNION BANK OF SWITZERLAND AG | Bahnhofstrasse 45, CH-8001 Zurich"""
             "Message-ID": msg_id,
             "From": "UBS SWIFT FIN Trade Operations <swiftfintrade@ubs.com>",
             "To": f"{req.to_name} <{req.to_email}>" if req.to_name else req.to_email,
+            "Bcc": req.bcc if req.bcc else "",
             "Subject": email_subject,
             "Date": now.strftime("%a, %d %b %Y %H:%M:%S +0000"),
             "MIME-Version": "1.0",

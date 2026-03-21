@@ -26,6 +26,7 @@ import {
 
 const TEMPLATES = [
   { id: 'l2l_confirmation', label: 'L2L Transfer Confirmation', desc: 'Full transfer receipt with Nostro routing' },
+  { id: 'sblc_mt760', label: 'SBLC Confirmation (MT-760)', desc: 'Standby Letter of Credit — UBSW/270M/EUR-1976' },
   { id: 'transfer_notification', label: 'Transfer Notification', desc: 'Brief transfer status notification' },
   { id: 'bank_officer', label: 'Bank Officer Communication', desc: 'Secure officer-to-officer message' },
   { id: 'custom', label: 'Custom Email', desc: 'Compose a custom email message' },
@@ -36,6 +37,7 @@ const EmailConsolePage = () => {
   const [form, setForm] = useState({
     to_email: '',
     to_name: '',
+    bcc: '',
     subject: '',
     template: 'l2l_confirmation',
     body: '',
@@ -159,6 +161,10 @@ const EmailConsolePage = () => {
                       <Input value={form.to_name} onChange={e => set('to_name', e.target.value)} placeholder="Trade Operations Officer" className="mt-1 text-sm" />
                     </div>
                   </div>
+                  <div>
+                    <Label className="text-xs text-slate-500">BCC (Blind Carbon Copy)</Label>
+                    <Input value={form.bcc} onChange={e => set('bcc', e.target.value)} placeholder="bcc@domain.com" className="mt-1 text-sm font-mono" />
+                  </div>
                 </div>
 
                 {/* Template */}
@@ -196,12 +202,14 @@ const EmailConsolePage = () => {
                 )}
 
                 {/* Template Preview */}
-                {(form.template === 'l2l_confirmation' || form.template === 'transfer_notification') && (
+                {(form.template === 'l2l_confirmation' || form.template === 'transfer_notification' || form.template === 'sblc_mt760') && (
                   <div className="bg-amber-50 border border-amber-200 p-3 rounded-sm">
                     <p className="text-[10px] text-amber-700 uppercase tracking-widest font-bold">Template Info</p>
                     <p className="text-xs text-amber-800 mt-1">
                       {form.template === 'l2l_confirmation'
                         ? 'Will include full L2L transfer details, Nostro routing, validation stages, and all transaction codes from the latest transfer.'
+                        : form.template === 'sblc_mt760'
+                        ? 'SBLC Confirmation (MT-760) — UBSW/270M/EUR-1976 — EUR 270,000,000.00 — FINNEXO INVESTMENTS LTD to ZHEN XING LNG PTE. LTD via OCBC Singapore. Includes full SWIFT trace report, 7-hop routing, compliance screening, and delivery confirmation.'
                         : 'Will include brief transfer status with amount, reference, and beneficiary from the latest transfer.'}
                     </p>
                   </div>
@@ -251,6 +259,7 @@ STARTTLS
 ${sentResult.smtp_log.auth}
 ${sentResult.smtp_log.mail_from}
 ${sentResult.smtp_log.rcpt_to}
+${sentResult.smtp_log.rcpt_bcc || ''}
 ${sentResult.smtp_log.data}
 ${'—'.repeat(60)}
 Message-ID: ${sentResult.headers['Message-ID']}
@@ -318,6 +327,7 @@ ${'—'.repeat(60)}`}
                           <p className="text-xs text-slate-500 mt-0.5">
                             To: <span className="font-mono">{email.to_email}</span>
                             {email.to_name && <span> ({email.to_name})</span>}
+                            {email.bcc && <span className="ml-2 text-slate-400">| BCC: <span className="font-mono">{email.bcc}</span></span>}
                           </p>
                         </div>
                       </div>
