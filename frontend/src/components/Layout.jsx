@@ -19,7 +19,8 @@ import {
   X,
   ChevronRight,
   FileText,
-  FileSpreadsheet
+  FileSpreadsheet,
+  FolderOpen
 } from 'lucide-react';
 
 const UBSLogo = ({ className }) => (
@@ -40,6 +41,7 @@ const navItems = [
   { path: '/cis', label: 'CIS Document', icon: FileText },
   { path: '/international-transfer', label: 'International Transfer', icon: Globe },
   { path: '/ledger-transfer', label: 'Ledger to Ledger', icon: ArrowRightLeft },
+  { path: '/l2l-documents', label: 'L2L Documents', icon: FolderOpen },
   { path: '/domestic-transfer', label: 'Domestic Transfer', icon: Building2 },
   { path: '/bill-payment', label: 'Bill Payment', icon: Receipt },
   { path: '/transactions', label: 'Transaction History', icon: History },

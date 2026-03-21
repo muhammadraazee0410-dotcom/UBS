@@ -1111,7 +1111,26 @@ async def create_ledger_transfer(req: LedgerTransferRequest, payload: dict = Dep
     }
     await db.transactions.insert_one(tx_record)
 
+    # Save full receipt for L2L Documents page
+    l2l_doc = {**receipt, "created_at": now}
+    await db.l2l_receipts.insert_one(l2l_doc)
+
     return receipt
+
+# ================ L2L DOCUMENTS ================
+
+@api_router.get("/l2l-documents")
+async def get_l2l_documents(payload: dict = Depends(verify_token)):
+    doc = await db.l2l_receipts.find_one(
+        {},
+        {"_id": 0},
+        sort=[("created_at", -1)]
+    )
+    if not doc:
+        raise HTTPException(status_code=404, detail="No L2L transfer found")
+    if "created_at" in doc and hasattr(doc["created_at"], "isoformat"):
+        doc["created_at"] = doc["created_at"].isoformat()
+    return doc
 
 # ================ CIS (Customer Information Sheet) ================
 
