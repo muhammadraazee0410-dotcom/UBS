@@ -112,7 +112,7 @@ const LedgerTransferPage = () => {
       set('receiver_account', b.account_number || '');
       set('receiver_iban', b.iban || '');
       set('receiver_bank_name', b.bank_name || '');
-      set('receiver_bank_address', b.bank_address || '');
+      set('receiver_bank_address', b.bank_address || b.address || '');
     }
   };
 
