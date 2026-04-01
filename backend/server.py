@@ -14,6 +14,7 @@ import jwt
 import bcrypt
 import random
 import string
+import re
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -97,6 +98,7 @@ class TransferBase(BaseModel):
     status: str = "pending"
     swift_message: Optional[str] = None
     tracking_id: Optional[str] = None
+    uetr: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class InternationalTransferCreate(BaseModel):
@@ -151,6 +153,11 @@ class ServerLog(BaseModel):
     level: str
     message: str
     service: str
+
+class UETREnquiryRequest(BaseModel):
+    uetr: Optional[str] = None
+    source_transaction_id: Optional[str] = None
+    source_screen: str = "APPLICATION_MENU"
 
 # ================ AUTH HELPERS ================
 
@@ -559,6 +566,229 @@ Manual Intervention:   NOT REQUIRED
 def generate_tracking_id() -> str:
     return f"GPI{''.join(random.choices(string.digits, k=20))}"
 
+def generate_uetr() -> str:
+    return str(uuid.uuid4())
+
+UETR_PATTERN = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
+UETR_CAPTURE_PATTERN = re.compile(r"<UETR>([0-9a-f-]{36})</UETR>", re.IGNORECASE)
+
+def generate_enquiry_reference() -> str:
+    return ''.join(random.choices(string.digits, k=16))
+
+def parse_uetr_from_swift_message(swift_message: str) -> Optional[str]:
+    if not swift_message:
+        return None
+    match = UETR_CAPTURE_PATTERN.search(swift_message)
+    if not match:
+        return None
+    parsed_uetr = match.group(1).lower()
+    if UETR_PATTERN.match(parsed_uetr):
+        return parsed_uetr
+    return None
+
+async def get_used_transaction_uetrs() -> set:
+    used_uetrs = set()
+    cursor = db.transfers.find({"uetr": {"$exists": True, "$ne": None}}, {"_id": 0, "uetr": 1})
+    async for transfer in cursor:
+        transfer_uetr = transfer.get("uetr")
+        if transfer_uetr:
+            used_uetrs.add(str(transfer_uetr).lower())
+    return used_uetrs
+
+def build_tracker_response_payload(target_uetr: str) -> dict:
+    outcome = random.choice(["success", "failure"])
+    status_description = "Tracker enquiry completed successfully" if outcome == "success" else "Tracker enquiry failed"
+    status_reason = "00" if outcome == "success" else "96"
+    reason_description = "Processed by SWIFT Tracker" if outcome == "success" else "Tracker processing error"
+    cancellation_status = "N"
+    cancellation_status_description = "Not Cancelled"
+
+    return {
+        "uetr": target_uetr,
+        "transaction_reference": f"TRX{''.join(random.choices(string.digits, k=10))}",
+        "enquiry_source_reference": f"SRC{''.join(random.choices(string.digits, k=12))}",
+        "source_reference": f"SOR{''.join(random.choices(string.digits, k=12))}",
+        "enquiry_source": "PXDGPIEN",
+        "transaction_type": random.choice(["OUTBOUND_RTGS", "OUTBOUND_CROSS_BORDER"]),
+        "account": random.choice([
+            "CH93 0027 3001 8839 9039 39",
+            "CH93 0027 3002 5883 9000 08",
+            "CH93 0027 3003 0000 3899 08",
+        ]),
+        "confirmation_status": outcome.upper(),
+        "status_description": status_description,
+        "status_reason": status_reason,
+        "reason_description": reason_description,
+        "cancellation_status": cancellation_status,
+        "cancellation_status_description": cancellation_status_description,
+        "api_response_status": {
+            "dcn": f"DCN{''.join(random.choices(string.digits, k=12))}",
+            "response_status": "Success" if outcome == "success" else "Failure",
+            "response_code": "200" if outcome == "success" else "500",
+            "error": "" if outcome == "success" else "Tracker Internal Error",
+        },
+    }
+
+async def resolve_source_transaction(source_transaction_id: Optional[str]) -> Optional[dict]:
+    if not source_transaction_id:
+        return None
+
+    transfer = await db.transfers.find_one({"id": source_transaction_id}, {"_id": 0})
+    if transfer:
+        return transfer
+
+    return await db.transactions.find_one({"id": source_transaction_id}, {"_id": 0})
+
+def format_uetr_enquiry_response(
+    enquiry_reference_number: str,
+    tracker_payload: dict,
+    source_record: Optional[dict] = None,
+    source_screen: str = "APPLICATION_MENU",
+) -> dict:
+    transaction_reference = tracker_payload.get("transaction_reference", "")
+    source_reference = tracker_payload.get("source_reference", "")
+    transaction_type = tracker_payload.get("transaction_type", "")
+    account = tracker_payload.get("account", "")
+    enquiry_source = tracker_payload.get("enquiry_source", "PXDGPIEN")
+
+    if source_record:
+        transaction_reference = source_record.get("reference", transaction_reference)
+        source_reference = source_record.get("id", source_reference)
+        transaction_type = source_record.get("transfer_type", source_record.get("transaction_type", transaction_type))
+        account = source_record.get("sender_account", account)
+        if source_screen == "PXSOVIEW":
+            enquiry_source = "PXSOVIEW"
+
+    return {
+        "uetr": tracker_payload["uetr"],
+        "enquiry_reference_number": enquiry_reference_number,
+        "transaction_reference": transaction_reference,
+        "enquiry_source_reference": tracker_payload.get("enquiry_source_reference", ""),
+        "source_reference": source_reference,
+        "enquiry_source": enquiry_source,
+        "transaction_type": transaction_type,
+        "account": account,
+        "confirmation_status": tracker_payload.get("confirmation_status", ""),
+        "status_description": tracker_payload.get("status_description", ""),
+        "status_reason": tracker_payload.get("status_reason", ""),
+        "reason_description": tracker_payload.get("reason_description", ""),
+        "cancellation_status": tracker_payload.get("cancellation_status", ""),
+        "cancellation_status_description": tracker_payload.get("cancellation_status_description", ""),
+        "api_response_status": tracker_payload.get("api_response_status", {}),
+    }
+
+async def get_enquiry_by_reference(enquiry_reference_number: str) -> dict:
+    enquiry = await db.tracker_enquiries.find_one(
+        {"enquiry_reference_number": enquiry_reference_number},
+        {"_id": 0},
+    )
+    if not enquiry:
+        raise HTTPException(status_code=404, detail="Enquiry reference not found")
+    return enquiry
+
+@api_router.get("/tracker-enquiry/prefill")
+async def get_uetr_enquiry_prefill(
+    source_transaction_id: str,
+    source_screen: str = "PXSOVIEW",
+    payload: dict = Depends(verify_token),
+):
+    source_record = await resolve_source_transaction(source_transaction_id)
+    if not source_record:
+        raise HTTPException(status_code=404, detail="Source transaction not found")
+
+    source_uetr = source_record.get("uetr")
+    if not source_uetr:
+        source_uetr = parse_uetr_from_swift_message(source_record.get("swift_message", ""))
+
+    if not source_uetr:
+        source_uetr = generate_uetr()
+
+    source_uetr = source_uetr.lower()
+    if source_record.get("uetr") != source_uetr and source_record.get("transfer_type"):
+        await db.transfers.update_one({"id": source_record["id"]}, {"$set": {"uetr": source_uetr}})
+        source_record["uetr"] = source_uetr
+
+    prefill = {
+        "uetr": source_uetr,
+        "enquiry_reference_number": generate_enquiry_reference(),
+        "transaction_reference": source_record.get("reference", ""),
+        "enquiry_source_reference": source_record.get("id", ""),
+        "source_reference": source_record.get("id", ""),
+        "enquiry_source": "PXSOVIEW",
+        "transaction_type": source_record.get("transfer_type", source_record.get("transaction_type", "")),
+        "account": source_record.get("sender_account", ""),
+        "confirmation_status": str(source_record.get("status", "")).upper(),
+        "status_description": "Prefilled from Outbound Cross Border/RTGS transaction",
+        "status_reason": "",
+        "reason_description": "",
+        "cancellation_status": "",
+        "cancellation_status_description": "",
+        "api_response_status": None,
+        "source_screen": source_screen.upper(),
+    }
+    return prefill
+
+@api_router.post("/tracker-enquiry")
+async def submit_uetr_enquiry(request: UETREnquiryRequest, payload: dict = Depends(verify_token)):
+    source_screen = (request.source_screen or "APPLICATION_MENU").upper()
+    source_record = await resolve_source_transaction(request.source_transaction_id)
+    target_uetr = (request.uetr or "").strip().lower()
+
+    if source_record:
+        source_uetr = source_record.get("uetr")
+        if not source_uetr:
+            source_uetr = parse_uetr_from_swift_message(source_record.get("swift_message", ""))
+        if not source_uetr:
+            source_uetr = generate_uetr()
+        target_uetr = source_uetr.lower()
+
+        if source_record.get("uetr") != target_uetr and source_record.get("transfer_type"):
+            await db.transfers.update_one({"id": source_record["id"]}, {"$set": {"uetr": target_uetr}})
+            source_record["uetr"] = target_uetr
+    else:
+        if not target_uetr:
+            raise HTTPException(status_code=422, detail="UETR is required")
+        if not UETR_PATTERN.match(target_uetr):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Invalid UETR format. Expected xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx "
+                    "(lowercase hex, y in 8/9/a/b)."
+                ),
+            )
+
+        used_uetrs = await get_used_transaction_uetrs()
+        if target_uetr in used_uetrs:
+            raise HTTPException(
+                status_code=400,
+                detail="UETR should not map to any existing Outbound/Inbound Cross Border/RTGS transaction",
+            )
+
+    enquiry_reference_number = generate_enquiry_reference()
+    tracker_payload = build_tracker_response_payload(target_uetr)
+    response = format_uetr_enquiry_response(
+        enquiry_reference_number=enquiry_reference_number,
+        tracker_payload=tracker_payload,
+        source_record=source_record,
+        source_screen=source_screen,
+    )
+    response["source_screen"] = source_screen
+    response["enquiry_requested_at"] = datetime.now(timezone.utc).isoformat()
+
+    await db.tracker_enquiries.insert_one({
+        **response,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return response
+
+@api_router.get("/tracker-enquiry/response-status/{enquiry_reference_number}")
+async def get_uetr_enquiry_response_status(
+    enquiry_reference_number: str,
+    payload: dict = Depends(verify_token),
+):
+    enquiry = await get_enquiry_by_reference(enquiry_reference_number)
+    return enquiry.get("api_response_status", {})
+
 # ================ AUTH ROUTES ================
 
 @api_router.post("/auth/login", response_model=LoginResponse)
@@ -679,6 +909,7 @@ async def create_international_transfer(data: InternationalTransferCreate, paylo
     else:
         swift_message = generate_mt103(transfer_data, beneficiary)
     
+    extracted_uetr = parse_uetr_from_swift_message(swift_message)
     transfer = TransferBase(
         transfer_type=data.transfer_type,
         amount=data.amount,
@@ -691,7 +922,8 @@ async def create_international_transfer(data: InternationalTransferCreate, paylo
         reference=data.reference,
         status="processing",
         swift_message=swift_message,
-        tracking_id=generate_tracking_id()
+        tracking_id=generate_tracking_id(),
+        uetr=extracted_uetr or generate_uetr(),
     )
     
     doc = transfer.model_dump()

@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
 import {
   TrendingUp,
@@ -15,9 +17,10 @@ import {
   Activity,
   RefreshCw,
   ArrowUpRight,
-  CheckCircle2
+  CheckCircle2,
+  ArrowRight
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const formatCurrency = (amount, currency) => {
   return new Intl.NumberFormat('en-US', {
@@ -40,6 +43,8 @@ const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [launcherCode, setLauncherCode] = useState('');
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     setLoading(true);
@@ -62,6 +67,16 @@ const DashboardPage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleTrackerLauncher = (event) => {
+    event.preventDefault();
+    if (launcherCode.trim() !== 'PXDGPIEN') {
+      toast.error('Specify PXDGPIEN to open gpi Tracker Enquiry by UETR');
+      return;
+    }
+
+    navigate('/tracking');
+  };
 
   const currencyFlags = {
     EUR: '🇪🇺',
@@ -97,6 +112,32 @@ const DashboardPage = () => {
           Refresh
         </Button>
       </div>
+
+      <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
+        <CardContent className="p-6">
+          <form onSubmit={handleTrackerLauncher} className="flex items-end gap-3">
+            <div className="flex-1">
+              <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider mb-2 block">
+                Homepage Launcher
+              </Label>
+              <Input
+                value={launcherCode}
+                onChange={(e) => setLauncherCode(e.target.value)}
+                placeholder="Specify PXDGPIEN"
+                className="h-12 bg-swiss-bg-subtle border-slate-200 text-slate-900 font-mono rounded-sm"
+              />
+            </div>
+            <Button
+              type="submit"
+              size="icon"
+              className="h-12 w-12 bg-swiss-red hover:bg-swiss-red-hover text-white rounded-sm"
+              aria-label="Open gpi Tracker Enquiry by UETR"
+            >
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
       {/* Balance Cards - Bento Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

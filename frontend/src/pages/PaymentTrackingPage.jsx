@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../services/api';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -6,237 +6,242 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Badge } from '../components/ui/badge';
-import { ScrollArea } from '../components/ui/scroll-area';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import {
   MapPin,
-  Search,
   Loader2,
-  CheckCircle2,
-  Clock,
-  Plane,
-  Building2,
-  ArrowRight
+  ArrowRight,
+  ExternalLink,
+  Search,
 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const PaymentTrackingPage = () => {
-  const [trackingId, setTrackingId] = useState('');
+  const location = useLocation();
+  const [uetr, setUetr] = useState('');
+  const [sourceTransactionId, setSourceTransactionId] = useState('');
+  const [sourceScreen, setSourceScreen] = useState('APPLICATION_MENU');
   const [loading, setLoading] = useState(false);
-  const [trackingData, setTrackingData] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [enquiryData, setEnquiryData] = useState(null);
+  const [apiStatusData, setApiStatusData] = useState(null);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
 
-  const handleTrack = async (e) => {
+  useEffect(() => {
+    const state = location.state || {};
+    if (state.programCode === 'PXDGPIEN') {
+      setSourceScreen(state.sourceScreen || 'APPLICATION_MENU');
+    }
+    if (state.sourceTransactionId) {
+      setSourceTransactionId(state.sourceTransactionId);
+      setSourceScreen(state.sourceScreen || 'PXSOVIEW');
+      prefillFromSourceTransaction(state.sourceTransactionId, state.sourceScreen || 'PXSOVIEW');
+    }
+  }, [location.state]);
+
+  const prefillFromSourceTransaction = async (transactionId, screen) => {
+    try {
+      const response = await api.get('/tracker-enquiry/prefill', {
+        params: {
+          source_transaction_id: transactionId,
+          source_screen: screen,
+        },
+      });
+      setUetr(response.data.uetr || '');
+      setEnquiryData(response.data);
+    } catch (error) {
+      toast.error('Unable to prefill data from selected transaction');
+    }
+  };
+
+  const handleEnquiryRequest = async (e) => {
     e.preventDefault();
-    if (!trackingId.trim()) {
-      toast.error('Please enter a tracking ID');
+
+    if (!sourceTransactionId && !uetr.trim()) {
+      toast.error('Please specify UETR');
       return;
     }
-    
+
     setLoading(true);
     try {
-      const response = await api.get(`/tracking/${trackingId}`);
-      setTrackingData(response.data);
+      const response = await api.post('/tracker-enquiry', {
+        uetr: sourceTransactionId ? undefined : uetr,
+        source_transaction_id: sourceTransactionId || undefined,
+        source_screen: sourceScreen,
+      });
+      setEnquiryData(response.data);
+      setUetr(response.data.uetr || uetr);
+      toast.success('Enquiry request sent to Tracker');
     } catch (error) {
-      toast.error('Transfer not found');
-      setTrackingData(null);
+      toast.error(error.response?.data?.detail || 'Failed to process enquiry request');
+      setEnquiryData(null);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'initiated':
-        return <Clock className="w-5 h-5" />;
-      case 'processing':
-        return <Loader2 className="w-5 h-5 animate-spin" />;
-      case 'in_transit':
-        return <Plane className="w-5 h-5" />;
-      case 'delivered':
-        return <CheckCircle2 className="w-5 h-5" />;
-      default:
-        return <Clock className="w-5 h-5" />;
+  const handleViewApiResponseStatus = async () => {
+    if (!enquiryData?.enquiry_reference_number) {
+      return;
+    }
+
+    setStatusLoading(true);
+    try {
+      const response = await api.get(
+        `/tracker-enquiry/response-status/${enquiryData.enquiry_reference_number}`
+      );
+      setApiStatusData(response.data);
+      setStatusDialogOpen(true);
+    } catch (error) {
+      toast.error('Unable to fetch API response status');
+    } finally {
+      setStatusLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'initiated':
-        return 'bg-blue-500 text-slate-900';
-      case 'processing':
-        return 'bg-amber-500 text-slate-900';
-      case 'in_transit':
-        return 'bg-purple-500 text-slate-900';
-      case 'delivered':
-        return 'bg-swiss-status-success text-slate-900';
-      default:
-        return 'bg-swiss-bg-subtle text-swiss-text-secondary';
-    }
-  };
-
-  const formatCurrency = (amount, currency) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-    }).format(amount);
-  };
+  const fieldRows = [
+    ['UETR', enquiryData?.uetr || '-'],
+    ['Enquiry Reference Number', enquiryData?.enquiry_reference_number || '-'],
+    ['Transaction Reference', enquiryData?.transaction_reference || '-'],
+    ['Enquiry Source Reference', enquiryData?.enquiry_source_reference || '-'],
+    ['Source Reference', enquiryData?.source_reference || '-'],
+    ['Enquiry Source', enquiryData?.enquiry_source || '-'],
+    ['Transaction Type', enquiryData?.transaction_type || '-'],
+    ['Account', enquiryData?.account || '-'],
+    ['Confirmation Status', enquiryData?.confirmation_status || '-'],
+    ['Status Description', enquiryData?.status_description || '-'],
+    ['Status Reason', enquiryData?.status_reason || '-'],
+    ['Reason Description', enquiryData?.reason_description || '-'],
+    ['Cancellation Status', enquiryData?.cancellation_status || '-'],
+    ['Cancellation Status Description', enquiryData?.cancellation_status_description || '-'],
+  ];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="font-heading font-black text-3xl text-slate-900 uppercase tracking-tight flex items-center gap-3">
           <MapPin className="w-8 h-8 text-swiss-red" strokeWidth={1.5} />
-          Payment Tracking
+          gpi Tracker Enquiry by UETR
         </h1>
         <p className="text-swiss-text-secondary mt-1">
-          Track international payments with SWIFT GPI
+          Submit an enquiry request and view Tracker response details
         </p>
       </div>
 
-      {/* Search Card */}
       <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
         <CardContent className="p-6">
-          <form onSubmit={handleTrack} className="flex gap-4">
-            <div className="flex-1">
+          <form onSubmit={handleEnquiryRequest} className="space-y-4">
+            <div>
               <Label className="text-swiss-text-secondary uppercase text-xs tracking-wider mb-2 block">
-                GPI Tracking ID / UETR
+                UETR
               </Label>
               <Input
-                value={trackingId}
-                onChange={(e) => setTrackingId(e.target.value)}
+                value={uetr}
+                onChange={(e) => setUetr(e.target.value.trim())}
                 className="bg-swiss-bg-subtle border-slate-200 text-slate-900 font-mono rounded-sm h-12"
-                placeholder="GPI12345678901234567890"
+                placeholder="xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+                disabled={!!sourceTransactionId}
               />
             </div>
-            <div className="flex items-end">
+            <div className="flex flex-wrap gap-3">
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-12 px-8 bg-swiss-red hover:bg-swiss-red-hover text-white font-medium uppercase tracking-wider rounded-sm"
+                className="h-10 px-6 bg-swiss-red hover:bg-swiss-red-hover text-white font-medium uppercase tracking-wider rounded-sm"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <>
                     <Search className="w-4 h-4 mr-2" />
-                    Track
+                    Enquiry Request
                   </>
                 )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!enquiryData?.enquiry_reference_number || statusLoading}
+                onClick={handleViewApiResponseStatus}
+                className="h-10 px-6 border-slate-200 text-slate-900 rounded-sm"
+              >
+                {statusLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <ExternalLink className="w-4 h-4 mr-2" />}
+                API Response Status
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
 
-      {/* Tracking Results */}
-      {trackingData && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Transfer Details */}
-          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm lg:col-span-1">
-            <CardHeader>
-              <CardTitle className="font-heading text-lg text-slate-900">
-                Transfer Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-swiss-bg-subtle rounded-sm">
-                <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Amount</p>
-                <p className="font-mono text-2xl text-slate-900">
-                  {formatCurrency(trackingData.transfer.amount, trackingData.transfer.currency)}
-                </p>
-              </div>
-              
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Type</p>
-                  <Badge className="bg-blue-500/20 text-blue-400 rounded-sm">
-                    {trackingData.transfer.transfer_type}
-                  </Badge>
+      {enquiryData && (
+        <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg text-slate-900 flex items-center gap-2">
+              <Badge className="bg-blue-500/20 text-blue-500 rounded-sm border border-blue-500/30">
+                Figure 10-36
+              </Badge>
+              Enquiry Response
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {fieldRows.map(([label, value]) => (
+                <div key={label} className="p-3 border border-slate-200 rounded-sm bg-white">
+                  <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">{label}</p>
+                  <p className={`text-sm ${label.includes('UETR') || label.includes('Reference') || label === 'Account' ? 'font-mono text-slate-900' : 'text-slate-900'}`}>
+                    {value}
+                  </p>
                 </div>
-                <div>
-                  <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Beneficiary</p>
-                  <p className="text-slate-900">{trackingData.transfer.beneficiary_name}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">IBAN</p>
-                  <p className="font-mono text-xs text-swiss-text-secondary">{trackingData.transfer.beneficiary_iban}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">SWIFT/BIC</p>
-                  <p className="font-mono text-sm text-swiss-text-secondary">{trackingData.transfer.beneficiary_swift}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Reference</p>
-                  <p className="text-swiss-text-secondary">{trackingData.transfer.reference}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Tracking Timeline */}
-          <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="font-heading text-lg text-slate-900 flex items-center justify-between">
-                <span>Tracking Timeline</span>
-                <Badge className="bg-swiss-status-success/20 text-swiss-status-success rounded-sm">
-                  <CheckCircle2 className="w-3 h-3 mr-1" />
-                  Delivered
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[400px]">
-                <div className="relative">
-                  {/* Timeline line */}
-                  <div className="absolute left-6 top-6 bottom-6 w-px bg-white/10" />
-                  
-                  <div className="space-y-6">
-                    {trackingData.tracking_history.map((item, index) => (
-                      <div key={index} className="relative flex gap-4">
-                        {/* Status icon */}
-                        <div className={`relative z-10 w-12 h-12 rounded-sm flex items-center justify-center ${getStatusColor(item.status)}`}>
-                          {getStatusIcon(item.status)}
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="flex-1 pb-6">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="text-slate-900 font-medium capitalize">{item.status.replace('_', ' ')}</p>
-                              <p className="text-swiss-text-secondary text-sm">{item.description}</p>
-                            </div>
-                            <p className="font-mono text-xs text-swiss-text-muted">
-                              {new Date(item.timestamp).toLocaleString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2 mt-2">
-                            <MapPin className="w-3 h-3 text-swiss-text-muted" />
-                            <p className="text-xs text-swiss-text-muted">{item.location}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Empty State */}
-      {!trackingData && !loading && (
+      {!enquiryData && !loading && (
         <Card className="bg-swiss-bg-paper border-slate-200 rounded-sm">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="w-20 h-20 rounded-full bg-swiss-bg-subtle flex items-center justify-center mb-6">
-              <MapPin className="w-10 h-10 text-swiss-text-muted" strokeWidth={1} />
+              <ArrowRight className="w-10 h-10 text-swiss-text-muted" strokeWidth={1} />
             </div>
-            <h3 className="font-heading text-xl text-slate-900 mb-2">Track Your Payment</h3>
-            <p className="text-swiss-text-muted text-center max-w-md">
-              Enter your GPI tracking ID or UETR to track the status of your international payment in real-time.
+            <h3 className="font-heading text-xl text-slate-900 mb-2">Submit UETR Enquiry</h3>
+            <p className="text-swiss-text-muted text-center max-w-xl">
+              Enter a valid UETR in lowercase format and click Enquiry Request to generate a 16-digit enquiry reference and fetch Tracker response details.
             </p>
           </CardContent>
         </Card>
       )}
+
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent className="bg-white border-slate-200 max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-slate-900 flex items-center gap-2">
+              <Badge className="bg-purple-500/20 text-purple-500 rounded-sm border border-purple-500/30">
+                Figure 10-37
+              </Badge>
+              View API Response Status
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="p-3 border border-slate-200 rounded-sm bg-swiss-bg-paper">
+              <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">DCN</p>
+              <p className="font-mono text-sm text-slate-900">{apiStatusData?.dcn || '-'}</p>
+            </div>
+            <div className="p-3 border border-slate-200 rounded-sm bg-swiss-bg-paper">
+              <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Response Status</p>
+              <p className="text-sm text-slate-900">{apiStatusData?.response_status || '-'}</p>
+            </div>
+            <div className="p-3 border border-slate-200 rounded-sm bg-swiss-bg-paper">
+              <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Response Code</p>
+              <p className="font-mono text-sm text-slate-900">{apiStatusData?.response_code || '-'}</p>
+            </div>
+            <div className="p-3 border border-slate-200 rounded-sm bg-swiss-bg-paper md:col-span-2">
+              <p className="text-xs text-swiss-text-muted uppercase tracking-wider mb-1">Error</p>
+              <p className="text-sm text-slate-900">{apiStatusData?.error || '-'}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
