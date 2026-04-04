@@ -58,7 +58,9 @@
   },
   "scripts": {
     "start": "craco start",
+    "preview": "PORT=${PORT:-3001} craco start",
     "build": "craco build",
+    "live": "sh -c 'craco build && npm exec --yes serve -- -s build -l ${PORT:-4173}'",
     "test": "craco test"
   },
   "browserslist": {
