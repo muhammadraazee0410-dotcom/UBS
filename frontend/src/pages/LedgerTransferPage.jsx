@@ -108,11 +108,11 @@ const LedgerTransferPage = () => {
     const b = beneficiaries.find(x => x.id === id);
     if (b) {
       set('receiver_name', b.name);
-      set('receiver_swift', b.swift_code || b.swift || '');
+      set('receiver_swift', b.swift_bic || b.swift_code || b.swift || '');
       set('receiver_account', b.account_number || '');
       set('receiver_iban', b.iban || '');
       set('receiver_bank_name', b.bank_name || '');
-      set('receiver_bank_address', b.bank_address || '');
+      set('receiver_bank_address', b.bank_address || b.address || '');
     }
   };
 
